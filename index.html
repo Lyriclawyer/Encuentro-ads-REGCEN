@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>REGCEN - Registro Galáctico</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,900;1,900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-cyan: #00f3ff;
+            --dark-bg: #000000;
+            --sw-gray: #151515;
+            --sw-border: rgba(255, 255, 255, 0.15);
+            --text-bright: #ffffff;
+            --text-muted: #999999;
+            --gold: #fade4b;
+            --accent-color: var(--neon-cyan);
+            --faction-glow: rgba(0, 243, 255, 0.3);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-bright);
+            font-family: 'Rajdhani', sans-serif;
+            overflow: hidden; 
+            min-height: 100vh;
+            position: relative;
+            transition: --accent-color 0.4s ease;
+        }
+
+        body::before {
+            content: " "; display: block; position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 243, 255, 0.01) 50%);
+            z-index: 99; background-size: 100% 4px; pointer-events: none;
+        }
+
+        .sw-font {
+            font-family: 'Montserrat', sans-serif; font-weight: 900; text-transform: uppercase; letter-spacing: -1px;
+            background-image: url('https://www.transparenttextures.com/patterns/stardust.png'), linear-gradient(180deg, #ffffff 30%, #a6b8c7 100%);
+            background-color: #000; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.8));
+        }
+
+        #hyperspace { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; }
+        #flash-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #ffffff; opacity: 0; z-index: 9999; pointer-events: none; transition: opacity 0.1s ease; }
+
+        /* --- HEADER / LOGO REGCEN --- */
+        .main-header {
+            position: fixed; top: 0; left: 0; width: 100%; padding: 15px 20px;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 900; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--sw-border);
+        }
+        .logo-regcen {
+            font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 2.2rem;
+            text-transform: uppercase; letter-spacing: 6px;
+            background: linear-gradient(180deg, #ffffff 20%, #a6b8c7 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 15px rgba(0, 243, 255, 0.5));
+            text-align: center;
+        }
+        .logo-regcen span { color: var(--neon-cyan); -webkit-text-fill-color: var(--neon-cyan); text-shadow: 0 0 30px var(--neon-cyan); }
+
+        /* --- PANTALLA DE INICIO (HERO) --- */
+        #hero-section {
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; padding: 0 20px; max-width: 100vw; height: 100vh;
+            position: relative; z-index: 5;
+        }
+        .hero-title { font-size: 4.5rem; line-height: 0.9; margin-bottom: 15px; margin-top: -50px; }
+        .hero-slogan { font-size: 1.6rem; color: var(--text-bright); font-style: italic; margin-bottom: 40px; font-weight: 500; }
+
+        .options-grid {
+            display: flex; gap: 25px; flex-wrap: wrap; justify-content: center; margin-top: 10px;
+        }
+        .option-btn {
+            background: rgba(21, 21, 21, 0.8); border: 2px solid var(--neon-cyan);
+            border-radius: 20px; padding: 30px 40px; min-width: 180px;
+            display: flex; flex-direction: column; align-items: center; gap: 12px;
+            cursor: pointer; transition: all 0.4s ease; backdrop-filter: blur(4px);
+            color: var(--text-bright); font-family: 'Montserrat', sans-serif; font-weight: 900;
+            text-transform: uppercase; font-size: 1.1rem;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
+        }
+        .option-btn i { font-size: 2.5rem; color: var(--neon-cyan); transition: transform 0.3s ease; }
+        .option-btn:hover {
+            background: rgba(0, 243, 255, 0.1); transform: scale(1.05);
+            box-shadow: 0 0 50px rgba(0, 243, 255, 0.4); border-color: #ffffff;
+        }
+        .option-btn:hover i { transform: scale(1.2) rotate(5deg); }
+
+        /* --- FORMULARIO (SPA) --- */
+        .app-section {
+            display: none; height: 100vh; width: 100vw; padding: 130px 40px 40px 40px;
+            max-width: 900px; margin: 0 auto; position: relative; z-index: 10; overflow-y: auto;
+        }
+        .form-container {
+            background: rgba(21, 21, 21, 0.95); border: 2px solid var(--accent-color);
+            border-radius: 20px; padding: 40px; box-shadow: 0 0 60px var(--faction-glow);
+            backdrop-filter: blur(10px); animation: fadeIn 0.8s ease;
+        }
+        .form-title {
+            font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 2rem;
+            text-transform: uppercase; margin-bottom: 10px; text-align: center;
+            color: var(--gold); text-shadow: 0 0 30px rgba(250, 222, 75, 0.3);
+        }
+        .form-subtitle {
+            text-align: center; color: var(--text-muted); margin-bottom: 30px; font-size: 1rem;
+            font-style: italic; letter-spacing: 1px;
+        }
+
+        .form-group { margin-bottom: 25px; width: 100%; }
+        .form-label {
+            display: block; font-size: 0.9rem; color: var(--text-bright);
+            margin-bottom: 8px; text-transform: uppercase; font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .form-label i { color: var(--accent-color); margin-right: 8px; }
+        .form-input, .form-select {
+            width: 100%; background: #000; border: 2px solid var(--sw-border);
+            padding: 12px 16px; color: #ffffff; font-family: 'Rajdhani', sans-serif;
+            font-size: 1.1rem; border-radius: 10px; transition: border-color 0.3s ease;
+            outline: none;
+        }
+        .form-input:focus, .form-select:focus {
+            border-color: var(--accent-color); box-shadow: 0 0 20px var(--faction-glow);
+        }
+        .form-select option { background: #000; color: #fff; }
+
+        .btn-sw {
+            background: var(--gold); border: none; color: #000000;
+            font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1rem;
+            text-transform: uppercase; padding: 16px 40px; cursor: pointer;
+            letter-spacing: 2px; border-radius: 30px; transition: all 0.3s ease;
+            width: 100%; margin-top: 10px;
+            box-shadow: 0 0 20px rgba(250, 222, 75, 0.3);
+        }
+        .btn-sw:hover { background: #ffffff; transform: scale(1.02); box-shadow: 0 0 40px rgba(255,255,255,0.5); }
+
+        .back-btn {
+            background: transparent; border: 2px solid var(--sw-border); color: var(--text-muted);
+            padding: 10px 20px; border-radius: 30px; cursor: pointer; font-family: 'Rajdhani', sans-serif;
+            font-weight: 700; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease;
+            margin-top: 20px; display: inline-block; font-size: 0.8rem;
+        }
+        .back-btn:hover { border-color: var(--accent-color); color: var(--text-bright); }
+
+        /* --- MENSAJE DE GRACIAS --- */
+        .thankyou-message {
+            display: none; text-align: center; padding: 40px; animation: fadeIn 1s ease;
+        }
+        .thankyou-message i { font-size: 4rem; color: var(--gold); margin-bottom: 20px; display: block; text-shadow: 0 0 40px var(--gold); }
+        .thankyou-message h2 { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 2.2rem; color: var(--text-bright); margin-bottom: 15px; }
+        .thankyou-message p { color: var(--text-muted); font-size: 1.2rem; line-height: 1.6; max-width: 600px; margin: 0 auto; }
+        .thankyou-message .highlight { color: var(--gold); font-weight: 700; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 3px; }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.8rem; }
+            .app-section { padding: 120px 15px 20px 15px; }
+            .options-grid { flex-direction: column; align-items: center; gap: 15px; }
+            .option-btn { width: 100%; max-width: 300px; padding: 20px; flex-direction: row; justify-content: center; }
+            .option-btn i { font-size: 1.8rem; }
+            .form-container { padding: 25px; }
+            .form-title { font-size: 1.5rem; }
+            .logo-regcen { font-size: 1.6rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="flash-overlay"></div>
+    <canvas id="hyperspace"></canvas>
+
+    <!-- Audio de Fondo -->
+    <audio id="bg-audio" loop preload="auto" style="display:none;">
+        <source src="FOUND SOUND.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- HEADER CON LOGO REGCEN -->
+    <header class="main-header">
+        <div class="logo-regcen">REG<span>CEN</span></div>
+    </header>
+
+    <!-- PANTALLA DE INICIO -->
+    <section id="hero-section">
+        <h1 class="hero-title sw-font">Registro<br>Galáctico</h1>
+        <p class="hero-slogan">"Elige tu destino en la Fuerza"</p>
+        <div class="options-grid">
+            <button class="option-btn" onclick="openForm('animacion')">
+                <i class="fas fa-film"></i> Animación
+            </button>
+            <button class="option-btn" onclick="openForm('talleres')">
+                <i class="fas fa-tools"></i> Talleres
+            </button>
+            <button class="option-btn" onclick="openForm('temas')">
+                <i class="fas fa-lightbulb"></i> Temas
+            </button>
+        </div>
+    </section>
+
+    <!-- SECCIÓN DEL FORMULARIO (SPA) -->
+    <section id="form-section" class="app-section">
+        <div class="form-container" id="form-container">
+            <h2 class="form-title" id="form-title-dynamic">Registro</h2>
+            <p class="form-subtitle" id="form-subtitle-dynamic">Completa tus datos para unirte a la causa</p>
+            
+            <form id="registration-form" onsubmit="submitForm(event)">
+                <!-- Ciudad -->
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-globe-americas"></i> Ciudad</label>
+                    <select class="form-select" id="ciudad" required>
+                        <option value="" disabled selected>Selecciona tu ciudad...</option>
+                        <option value="Pachuca">Pachuca</option>
+                        <option value="Aguascalientes">Aguascalientes</option>
+                        <option value="Irapuato">Irapuato</option>
+                        <option value="León">León</option>
+                        <option value="Durango">Durango</option>
+                        <option value="San Luis Potosí">San Luis Potosí</option>
+                    </select>
+                </div>
+
+                <!-- Teléfono -->
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-phone"></i> Número de Teléfono</label>
+                    <input type="tel" class="form-input" id="telefono" placeholder="Ej: 123 456 7890" required>
+                </div>
+
+                <!-- Botón de Enviar -->
+                <button type="submit" class="btn-sw">
+                    <i class="fas fa-paper-plane"></i> Transmitir Registro
+                </button>
+            </form>
+
+            <!-- Botón para volver -->
+            <div style="text-align:center;">
+                <button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
+            </div>
+        </div>
+
+        <!-- Mensaje de Agradecimiento -->
+        <div class="form-container thankyou-message" id="thankyou-container">
+            <i class="fas fa-check-circle"></i>
+            <h2>¡Que la Fuerza te Acompañe!</h2>
+            <p>Tu registro ha sido recibido con éxito, <span class="highlight" id="thankyou-name">ciudadano</span>.</p>
+            <p style="margin-top:15px; font-size: 1rem;">El <span class="highlight">Consejo</span> se pondrá en contacto contigo pronto a través de tu número de teléfono.</p>
+            <button class="back-btn" onclick="goBack()" style="margin-top:30px;"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
+        </div>
+    </section>
+
+    <script>
+        // ============================================================
+        // CONFIGURACIÓN DE ESTRELLAS (HYPERSPACE)
+        // ============================================================
+        const canvas = document.getElementById('hyperspace');
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+        const numStars = 150;
+        let stars = [];
+        let speed = 0.5;
+        let targetSpeed = 0.5;
+        let isJumping = false;
+
+        function initStars() {
+            stars = [];
+            for (let i=0; i<numStars; i++) {
+                stars.push({ x: Math.random()*width-width/2, y: Math.random()*height-height/2, z: Math.random()*width, color: Math.random()>0.4?'#ffffff':'#00f3ff', size: Math.random()*1.8+0.5 });
+            }
+        }
+
+        function animateStars() {
+            ctx.fillStyle = 'rgba(0,0,0,0.3)';
+            ctx.fillRect(0,0,width,height);
+            speed += (targetSpeed-speed)*0.08;
+            for (let i=0; i<numStars; i++) {
+                let star = stars[i];
+                star.z -= speed;
+                if (star.z <= 0) { star.x = Math.random()*width-width/2; star.y = Math.random()*height-height/2; star.z = width; }
+                let k = 500/star.z;
+                let px = star.x*k+width/2;
+                let py = star.y*k+height/2;
+                if (px>=0 && px<=width && py>=0 && py<=height) {
+                    let size = (1-star.z/width)*2.8*star.size;
+                    let stretch = isJumping ? speed*0.8 : 1;
+                    ctx.beginPath();
+                    ctx.strokeStyle = star.color;
+                    ctx.lineWidth = size;
+                    let prevK = 500/(star.z+stretch);
+                    ctx.moveTo(px,py);
+                    ctx.lineTo(star.x*prevK+width/2, star.y*prevK+height/2);
+                    ctx.stroke();
+                }
+            }
+            requestAnimationFrame(animateStars);
+        }
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            initStars();
+        });
+        initStars();
+        animateStars();
+
+        // ============================================================
+        // AUDIO
+        // ============================================================
+        window.addEventListener('load', () => {
+            const audio = document.getElementById('bg-audio');
+            if (audio) { audio.volume = 0.15; audio.loop = true; audio.play().catch(()=>{}); }
+        });
+        document.addEventListener('click', () => {
+            const audio = document.getElementById('bg-audio');
+            if (audio && audio.paused) audio.play().catch(()=>{});
+        }, { once: false });
+
+        // ============================================================
+        // NAVEGACIÓN Y FORMULARIO
+        // ============================================================
+        const heroSection = document.getElementById('hero-section');
+        const formSection = document.getElementById('form-section');
+        const formContainer = document.getElementById('form-container');
+        const thankyouContainer = document.getElementById('thankyou-container');
+        const formTitleDynamic = document.getElementById('form-title-dynamic');
+        const formSubtitleDynamic = document.getElementById('form-subtitle-dynamic');
+        const flashOverlay = document.getElementById('flash-overlay');
+
+        let currentOption = '';
+
+        // Función de transición de salto
+        function executeJumpSequence(cb) {
+            isJumping = true;
+            canvas.style.zIndex = "9995";
+            targetSpeed = 85;
+            setTimeout(() => { flashOverlay.style.opacity = '1'; }, 900);
+            setTimeout(() => { cb(); window.scrollTo(0,0); }, 1100);
+            setTimeout(() => {
+                flashOverlay.style.opacity = '0';
+                targetSpeed = 0.5;
+                canvas.style.zIndex = "-1";
+                isJumping = false;
+            }, 1300);
+        }
+
+        // Abrir formulario según la opción
+        function openForm(option) {
+            if (isJumping) return;
+            
+            // Configurar textos dinámicos
+            currentOption = option;
+            let title = '';
+            let subtitle = '';
+            
+            if (option === 'animacion') {
+                title = 'Registro: Animación';
+                subtitle = 'Inscríbete para el proyecto de animación galáctica';
+            } else if (option === 'talleres') {
+                title = 'Registro: Talleres';
+                subtitle = 'Aprende las artes Jedi y Sith en nuestros talleres';
+            } else if (option === 'temas') {
+                title = 'Registro: Temas';
+                subtitle = 'Propón y participa en los temas de la comunidad';
+            }
+
+            formTitleDynamic.textContent = title;
+            formSubtitleDynamic.textContent = subtitle;
+
+            // Mostrar formulario, ocultar agradecimiento
+            formContainer.style.display = 'block';
+            thankyouContainer.style.display = 'none';
+            
+            // Resetear formulario
+            document.getElementById('registration-form').reset();
+
+            // Transición
+            executeJumpSequence(() => {
+                heroSection.style.display = 'none';
+                formSection.style.display = 'block';
+            });
+        }
+
+        // Volver al inicio
+        function goBack() {
+            if (isJumping) return;
+            executeJumpSequence(() => {
+                formSection.style.display = 'none';
+                heroSection.style.display = 'flex';
+                // Limpiar campos por si acaso
+                document.getElementById('registration-form').reset();
+                formContainer.style.display = 'block';
+                thankyouContainer.style.display = 'none';
+            });
+        }
+
+        // Enviar formulario
+        function submitForm(event) {
+            event.preventDefault();
+
+            const ciudad = document.getElementById('ciudad').value;
+            const telefono = document.getElementById('telefono').value;
+
+            // Validación simple
+            if (!ciudad || !telefono) {
+                alert('Por favor, completa todos los campos.');
+                return;
+            }
+
+            // Actualizar mensaje de agradecimiento
+            document.getElementById('thankyou-name').textContent = `ciudadano de ${ciudad}`;
+
+            // Ocultar formulario, mostrar agradecimiento
+            formContainer.style.display = 'none';
+            thankyouContainer.style.display = 'block';
+
+            // (Opcional) Aquí podrías agregar lógica para enviar los datos a un servidor
+            console.log('Registro enviado:', { opcion: currentOption, ciudad, telefono });
+
+            // Animación de éxito (destello)
+            flashOverlay.style.opacity = '0.8';
+            setTimeout(() => { flashOverlay.style.opacity = '0'; }, 400);
+        }
+
+        // Inicialización: mostrar hero
+        heroSection.style.display = 'flex';
+        formSection.style.display = 'none';
+
+        console.log('🛸 REGCEN - Registro Galáctico v1.0');
+    </script>
+</body>
+</html>

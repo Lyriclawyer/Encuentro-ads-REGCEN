@@ -50,11 +50,6 @@
         #hyperspace { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; }
         #flash-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #ffffff; opacity: 0; z-index: 9999; pointer-events: none; transition: opacity 0.1s ease; }
 
-        /* Navbar */
-        .navbar { position: fixed; top: 0; left: 0; width: 100%; background: rgba(0, 0, 0, 0.95); border-bottom: 1px solid var(--sw-border); z-index: 900; display: none; flex-direction: column; align-items: center; backdrop-filter: blur(10px); }
-        .nav-top { width: 100%; max-width: 1200px; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); flex-wrap: wrap; gap: 10px; }
-        .nav-logo-img { height: 60px; margin: 5px 0; object-fit: contain; filter: drop-shadow(0px 0px 8px rgba(0, 243, 255, 0.2)); }
-        
         /* Secciones */
         .app-section { display: none; height: 100vh; width: 100vw; padding: 100px 20px 40px 20px; max-width: 1200px; margin: 0 auto; position: relative; z-index: 10; overflow-y: auto; }
         #hero-section { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px; max-width: 100vw; height: 100vh; position: relative; z-index: 5; }
@@ -143,6 +138,7 @@
         <img src="REGCEN.jpeg" alt="REGCEN" style="height: 80px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 0 20px rgba(0,243,255,0.3);" onerror="this.style.display='none'">
         <h1 class="hero-title sw-font">Encuentro<br>Regional REGCEN</h1>
         <p class="hero-slogan">"Una aventura galácticamente espiritual te espera"</p>
+        <!-- BOTÓN CORREGIDO CON ONCLICK -->
         <button class="btn-sw" onclick="goToLogin()"><i class="fas fa-rocket"></i> Saltar al hiperespacio</button>
     </section>
 
@@ -391,7 +387,6 @@
         // LÓGICA DE NAVEGACIÓN Y FORMULARIOS
         // ============================================================
         
-        // Datos simulados (en un caso real se usaría localStorage o una base de datos)
         let registros = JSON.parse(localStorage.getItem('regcen_registros')) || [];
 
         function saveRegistros() {
@@ -401,6 +396,7 @@
         function goToLogin() {
             executeJumpSequence(() => {
                 document.querySelectorAll('.app-section').forEach(s => s.style.display = 'none');
+                document.getElementById('hero-section').style.display = 'none'; // Ocultar el hero
                 document.getElementById('login-section').style.display = 'block';
                 backToLoginOptions();
             });
@@ -465,7 +461,6 @@
             registros.push(nuevoRegistro);
             saveRegistros();
 
-            // Mostrar mensaje Jedi
             document.getElementById('generated-code').innerText = nuevoCodigo;
             document.getElementById('register-form-container').style.display = 'none';
             document.getElementById('jedi-success-message').style.display = 'block';
@@ -518,7 +513,7 @@
                 return;
             }
 
-            registros.forEach((reg, index) => {
+            registros.forEach((reg) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${reg.origen}</td>

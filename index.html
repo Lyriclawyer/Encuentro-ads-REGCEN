@@ -1,3 +1,14 @@
+Aquí tienes la actualización del código. He realizado los siguientes cambios:
+
+1.  **Nombre Completo:** Se agregó el campo al principio del formulario de registro.
+2.  **Etapas:** Se cambiaron las opciones por las que solicitaste (amigos, servidores, solidarios, pre-coordinadores, coordinadores, asesores).
+3.  **Generación de Código por Estado:** El código ahora toma las iniciales del estado seleccionado y le añade 4 caracteres aleatorios. Por ejemplo, si eliges "San Luis Potosí", el código será `SLP-XXXX`.
+4.  **Tabla del Administrador:** Se actualizó para mostrar el Nombre Completo en lugar de la Edad (o junto a ella) para que sea más fácil identificar a la persona al aprobar el pago.
+
+### Instrucciones:
+Copia y pega este código en tu archivo. Sigue requiriendo tu `REGCEN.jpeg` y tu `FOUND SOUND.mp3`.
+
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -32,7 +43,6 @@
             position: relative;
         }
 
-        /* Scanlines effect */
         body::before {
             content: " "; display: block; position: fixed;
             top: 0; left: 0; bottom: 0; right: 0;
@@ -50,20 +60,17 @@
         #hyperspace { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; }
         #flash-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #ffffff; opacity: 0; z-index: 9999; pointer-events: none; transition: opacity 0.1s ease; }
 
-        /* Secciones */
         .app-section { display: none; height: 100vh; width: 100vw; padding: 100px 20px 40px 20px; max-width: 1200px; margin: 0 auto; position: relative; z-index: 10; overflow-y: auto; }
         #hero-section { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px; max-width: 100vw; height: 100vh; position: relative; z-index: 5; }
         
         .hero-title { font-size: 4.5rem; line-height: 0.9; margin-bottom: 15px; }
         .hero-slogan { font-size: 1.5rem; color: var(--text-bright); font-style: italic; margin-bottom: 40px; font-weight: 500; }
         
-        /* Botones */
         .btn-sw { background: var(--gold); border: none; color: #000000; font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 0.85rem; text-transform: uppercase; padding: 14px 35px; cursor: pointer; letter-spacing: 1px; border-radius: 25px; transition: all 0.3s ease; }
         .btn-sw:hover { background: #ffffff; transform: scale(1.05); box-shadow: 0 0 15px rgba(255,255,255,0.3); }
         .btn-outline { background: transparent; border: 2px solid var(--accent-color); color: var(--accent-color); }
         .btn-outline:hover { background: var(--accent-color); color: #000; }
 
-        /* Formularios */
         .form-container { background: var(--sw-gray); border: 1px solid var(--sw-border); border-radius: 16px; padding: 30px; max-width: 500px; margin: 0 auto; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
         .form-header { text-align: center; margin-bottom: 25px; }
         .form-header h2 { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.5rem; color: var(--accent-color); margin-bottom: 5px; }
@@ -75,7 +82,6 @@
         .form-input:focus, .form-select:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 10px var(--faction-glow); }
         .form-select option { background: #151515; color: #fff; }
         
-        /* Dashboard Admin */
         .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: var(--sw-gray); border-radius: 10px; overflow: hidden; font-size: 0.9rem; }
         .admin-table th, .admin-table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--sw-border); }
         .admin-table th { background: #222; color: var(--accent-color); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; }
@@ -84,7 +90,6 @@
         .status-approved { background: rgba(0, 255, 100, 0.2); color: #00ff64; border: 1px solid #00ff64; }
         .status-pending { background: rgba(255, 200, 0, 0.2); color: #ffc800; border: 1px solid #ffc800; }
 
-        /* Mensaje de Éxito (Estilo Jedi) */
         .jedi-message { display: none; text-align: center; padding: 40px 20px; max-width: 600px; margin: 0 auto; background: rgba(0,0,0,0.8); border: 2px solid var(--neon-cyan); border-radius: 16px; box-shadow: 0 0 50px var(--faction-glow); }
         .jedi-message h2 { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.8rem; color: var(--gold); margin-bottom: 20px; text-transform: uppercase; animation: glowPulse 2s infinite alternate; }
         .jedi-message p { font-size: 1.1rem; color: #d0d7de; line-height: 1.6; margin-bottom: 15px; font-style: italic; }
@@ -92,7 +97,6 @@
         
         @keyframes glowPulse { 0% { text-shadow: 0 0 20px rgba(250, 222, 75, 0.2); } 100% { text-shadow: 0 0 60px rgba(250, 222, 75, 0.5), 0 0 100px rgba(250, 222, 75, 0.2); } }
 
-        /* Sable de Luz */
         .lightsaber-container { position: fixed; bottom: 30px; left: 20px; z-index: 750; display: block; cursor: pointer; transition: transform 0.3s ease; }
         .lightsaber-container:hover { transform: scale(1.1) rotate(-5deg); }
         .lightsaber { width: 6px; height: 70px; background: var(--accent-color); border-radius: 3px; box-shadow: 0 0 30px var(--faction-glow), 0 0 60px var(--faction-glow); animation: saberPulse 0.8s ease-in-out infinite alternate; transform-origin: bottom; transform: rotate(-20deg); }
@@ -100,7 +104,6 @@
         .lightsaber::after { content: ''; position: absolute; top: -4px; left: -2px; width: 10px; height: 6px; background: var(--accent-color); border-radius: 50%; filter: blur(4px); opacity: 0.6; }
         @keyframes saberPulse { 0% { box-shadow: 0 0 20px var(--faction-glow), 0 0 40px var(--faction-glow); } 100% { box-shadow: 0 0 40px var(--faction-glow), 0 0 80px var(--faction-glow), 0 0 120px var(--faction-glow); } }
 
-        /* Partículas */
         #particles-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 1; overflow: hidden; }
         .particle { position: absolute; width: 4px; height: 4px; background: var(--accent-color); border-radius: 50%; opacity: 0.3; animation: floatParticle linear infinite; }
         @keyframes floatParticle { 0% { transform: translateY(100vh) scale(0); opacity: 0; } 10% { opacity: 0.3; } 90% { opacity: 0.3; } 100% { transform: translateY(-10vh) scale(1); opacity: 0; } }
@@ -138,7 +141,6 @@
         <img src="REGCEN.jpeg" alt="REGCEN" style="height: 80px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 0 20px rgba(0,243,255,0.3);" onerror="this.style.display='none'">
         <h1 class="hero-title sw-font">Encuentro<br>Regional REGCEN</h1>
         <p class="hero-slogan">"Una aventura galácticamente espiritual te espera"</p>
-        <!-- BOTÓN CORREGIDO CON ONCLICK -->
         <button class="btn-sw" onclick="goToLogin()"><i class="fas fa-rocket"></i> Saltar al hiperespacio</button>
     </section>
 
@@ -187,10 +189,17 @@
                 <p>Completa tus datos para unirte a la causa</p>
             </div>
             <form id="registration-form" onsubmit="submitRegistration(event)">
+                
+                <!-- NUEVO CAMPO: NOMBRE COMPLETO -->
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-user"></i> Nombre Completo</label>
+                    <input type="text" class="form-input" id="reg-nombre" placeholder="Ej. Luke Skywalker" required>
+                </div>
+
                 <div class="form-group">
                     <label class="form-label"><i class="fas fa-globe"></i> ¿De dónde vienes?</label>
                     <select class="form-select" id="reg-origen" required>
-                        <option value="" disabled selected>Selecciona tu planeta de origen...</option>
+                        <option value="" disabled selected>Selecciona tu estado...</option>
                         <option value="Pachuca">Pachuca</option>
                         <option value="Aguascalientes">Aguascalientes</option>
                         <option value="Irapuato">Irapuato</option>
@@ -200,20 +209,26 @@
                         <option value="Otro">Otro</option>
                     </select>
                 </div>
+
                 <div class="form-group">
                     <label class="form-label"><i class="fas fa-birthday-cake"></i> Edad</label>
                     <input type="number" class="form-input" id="reg-edad" placeholder="Ej. 25" min="10" max="99" required>
                 </div>
+
+                <!-- ETAPAS ACTUALIZADAS -->
                 <div class="form-group">
                     <label class="form-label"><i class="fas fa-graduation-cap"></i> Etapa en la que te encuentras</label>
                     <select class="form-select" id="reg-etapa" required>
                         <option value="" disabled selected>Selecciona tu etapa...</option>
-                        <option value="Estudiante">Estudiante</option>
-                        <option value="Profesionista">Profesionista</option>
-                        <option value="Buscando oportunidades">Buscando oportunidades</option>
-                        <option value="Otro">Otro</option>
+                        <option value="Amigos">Amigos</option>
+                        <option value="Servidores">Servidores</option>
+                        <option value="Solidarios">Solidarios</option>
+                        <option value="Pre-coordinadores">Pre-coordinadores</option>
+                        <option value="Coordinadores">Coordinadores</option>
+                        <option value="Asesores">Asesores</option>
                     </select>
                 </div>
+
                 <div class="form-group">
                     <label class="form-label"><i class="fas fa-bed"></i> ¿Requieres hospedaje?</label>
                     <select class="form-select" id="reg-hospedaje" required>
@@ -257,8 +272,8 @@
                 <table class="admin-table" id="admin-table">
                     <thead>
                         <tr>
+                            <th>Nombre</th>
                             <th>Origen</th>
-                            <th>Edad</th>
                             <th>Etapa</th>
                             <th>Hospedaje</th>
                             <th>Código</th>
@@ -396,7 +411,7 @@
         function goToLogin() {
             executeJumpSequence(() => {
                 document.querySelectorAll('.app-section').forEach(s => s.style.display = 'none');
-                document.getElementById('hero-section').style.display = 'none'; // Ocultar el hero
+                document.getElementById('hero-section').style.display = 'none'; 
                 document.getElementById('login-section').style.display = 'block';
                 backToLoginOptions();
             });
@@ -429,27 +444,51 @@
             document.getElementById('admin-login-form').style.display = 'none';
         }
 
-        function generateCode() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let code = 'REGCEN-';
-            for (let i = 0; i < 4; i++) {
-                code += chars.charAt(Math.floor(Math.random() * chars.length));
+        // ============================================================
+        // GENERACIÓN DE CÓDIGO BASADO EN ESTADO
+        // ============================================================
+        function generateCode(estado) {
+            let prefijo = 'REG'; // Por defecto
+            
+            // Diccionario de abreviaciones
+            const abreviaciones = {
+                'Pachuca': 'PCH',
+                'Aguascalientes': 'AGS',
+                'Irapuato': 'IRT',
+                'San Luis Potosí': 'SLP',
+                'Durango': 'DGO',
+                'León': 'LEO',
+                'Otro': 'OTR'
+            };
+
+            if (abreviaciones[estado]) {
+                prefijo = abreviaciones[estado];
             }
-            return code;
+
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let sufijo = '';
+            for (let i = 0; i < 4; i++) {
+                sufijo += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            
+            return prefijo + '-' + sufijo;
         }
 
         function submitRegistration(event) {
             event.preventDefault();
             
+            const nombre = document.getElementById('reg-nombre').value.trim();
             const origen = document.getElementById('reg-origen').value;
             const edad = document.getElementById('reg-edad').value;
             const etapa = document.getElementById('reg-etapa').value;
             const hospedaje = document.getElementById('reg-hospedaje').value;
 
-            const nuevoCodigo = generateCode();
+            // Generar código basado en el estado seleccionado
+            const nuevoCodigo = generateCode(origen);
 
             const nuevoRegistro = {
                 id: Date.now(),
+                nombre: nombre,
                 origen: origen,
                 edad: edad,
                 etapa: etapa,
@@ -516,8 +555,8 @@
             registros.forEach((reg) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
+                    <td style="font-weight:bold;">${reg.nombre}</td>
                     <td>${reg.origen}</td>
-                    <td>${reg.edad}</td>
                     <td>${reg.etapa}</td>
                     <td>${reg.hospedaje}</td>
                     <td style="font-family:monospace; color:var(--neon-cyan); font-weight:bold;">${reg.codigo}</td>
@@ -575,3 +614,4 @@
     </script>
 </body>
 </html>
+```

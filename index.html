@@ -57,6 +57,7 @@
         
         .btn-sw { background: var(--gold); border: none; color: #000000; font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 0.85rem; text-transform: uppercase; padding: 14px 35px; cursor: pointer; letter-spacing: 1px; border-radius: 25px; transition: all 0.3s ease; }
         .btn-sw:hover { background: #ffffff; transform: scale(1.05); box-shadow: 0 0 15px rgba(255,255,255,0.3); }
+        .btn-sw:disabled { background: #555; color: #888; cursor: not-allowed; transform: none; box-shadow: none; }
         .btn-outline { background: transparent; border: 2px solid var(--accent-color); color: var(--accent-color); }
         .btn-outline:hover { background: var(--accent-color); color: #000; }
 
@@ -86,6 +87,58 @@
         
         @keyframes glowPulse { 0% { text-shadow: 0 0 20px rgba(250, 222, 75, 0.2); } 100% { text-shadow: 0 0 60px rgba(250, 222, 75, 0.5), 0 0 100px rgba(250, 222, 75, 0.2); } }
 
+        /* --- ESTILOS DEL DASHBOARD DE USUARIO APROBADO --- */
+        .user-dashboard-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; max-width: 900px; margin: 0 auto 30px auto; }
+        @media (max-width: 768px) { .user-dashboard-grid { grid-template-columns: 1fr; } }
+
+        .credential-card { background: linear-gradient(135deg, #1a1a2e, #0f0f1a); border: 2px solid var(--accent-color); border-radius: 16px; padding: 20px; text-align: center; position: relative; overflow: hidden; box-shadow: 0 0 30px var(--faction-glow); }
+        .credential-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(0, 243, 255, 0.1), transparent); transform: rotate(45deg); animation: shine 3s infinite; }
+        @keyframes shine { 0% { transform: translateX(-100%) rotate(45deg); } 100% { transform: translateX(100%) rotate(45deg); } }
+        
+        .credential-card h3 { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1rem; color: var(--gold); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; }
+        .credential-card .qr-sim { width: 100px; height: 100px; background: #fff; margin: 15px auto; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; color: #000; }
+        .credential-card .user-name { font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+        .credential-card .user-code { font-family: monospace; color: var(--neon-cyan); font-weight: bold; font-size: 1.1rem; letter-spacing: 1px; background: rgba(0,243,255,0.1); padding: 4px 10px; border-radius: 6px; display: inline-block; }
+
+        .event-info-card { background: var(--sw-gray); border: 1px solid var(--sw-border); border-radius: 16px; padding: 25px; }
+        .event-info-card h3 { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.2rem; color: var(--accent-color); text-transform: uppercase; margin-bottom: 15px; border-bottom: 1px solid var(--sw-border); padding-bottom: 10px; }
+        .event-detail { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 15px; }
+        .event-detail i { font-size: 1.2rem; color: var(--gold); margin-top: 3px; width: 20px; text-align: center; }
+        .event-detail div strong { display: block; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .event-detail div span { font-size: 1.05rem; color: var(--text-bright); }
+
+        /* --- TEMPORIZADOR --- */
+        .countdown-container { text-align: center; margin: 20px 0; padding: 20px; background: rgba(0,0,0,0.5); border-radius: 12px; border: 1px dashed var(--sw-border); }
+        .countdown-title { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.2rem; color: var(--gold); margin-bottom: 15px; text-transform: uppercase; }
+        .countdown-timer { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        .time-box { background: var(--sw-gray); border: 1px solid var(--accent-color); padding: 10px 15px; border-radius: 8px; min-width: 70px; box-shadow: 0 0 15px var(--faction-glow); }
+        .time-box .num { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.8rem; color: #fff; display: block; line-height: 1; }
+        .time-box .label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* --- TALLERES Y STAFF --- */
+        .section-subtitle { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.3rem; color: var(--gold); text-transform: uppercase; margin: 30px auto 15px auto; max-width: 900px; border-left: 4px solid var(--accent-color); padding-left: 10px; }
+        
+        .workshop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; max-width: 900px; margin: 0 auto; }
+        .workshop-card { background: var(--sw-gray); border: 1px solid var(--sw-border); border-radius: 12px; padding: 20px; transition: all 0.3s ease; display: flex; flex-direction: column; justify-content: space-between; }
+        .workshop-card:hover { border-color: var(--accent-color); transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .workshop-card.selected { border-color: var(--gold); box-shadow: 0 0 20px rgba(250,222,75,0.3); }
+        .workshop-card.full { opacity: 0.5; filter: grayscale(1); pointer-events: none; }
+        .workshop-title { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1rem; color: var(--accent-color); margin-bottom: 10px; }
+        .workshop-desc { font-size: 0.85rem; color: var(--text-bright); margin-bottom: 10px; line-height: 1.4; }
+        .workshop-meta { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px; }
+        .workshop-meta strong { color: var(--gold); }
+        .workshop-capacity { font-size: 0.8rem; font-weight: 700; margin-bottom: 10px; text-align: center; }
+        .capacity-bar { width: 100%; height: 6px; background: #333; border-radius: 3px; overflow: hidden; margin-top: 5px; }
+        .capacity-fill { height: 100%; background: var(--neon-cyan); width: 0%; transition: width 0.3s; }
+
+        .staff-form { max-width: 900px; margin: 0 auto; background: var(--sw-gray); border: 1px solid var(--sw-border); border-radius: 12px; padding: 20px; }
+        .staff-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
+        .staff-option { background: #000; border: 1px solid var(--sw-border); padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; transition: all 0.3s ease; }
+        .staff-option:hover { border-color: var(--accent-color); }
+        .staff-option.selected { border-color: var(--gold); background: rgba(250,222,75,0.05); }
+        .staff-option i { font-size: 1.5rem; color: var(--accent-color); margin-bottom: 10px; display: block; }
+        .staff-option span { font-weight: 700; font-size: 0.9rem; text-transform: uppercase; }
+
         .lightsaber-container { position: fixed; bottom: 30px; left: 20px; z-index: 750; display: block; cursor: pointer; transition: transform 0.3s ease; }
         .lightsaber-container:hover { transform: scale(1.1) rotate(-5deg); }
         .lightsaber { width: 6px; height: 70px; background: var(--accent-color); border-radius: 3px; box-shadow: 0 0 30px var(--faction-glow), 0 0 60px var(--faction-glow); animation: saberPulse 0.8s ease-in-out infinite alternate; transform-origin: bottom; transform: rotate(-20deg); }
@@ -108,6 +161,9 @@
             .lightsaber { height: 50px; }
             .admin-table { font-size: 0.75rem; }
             .admin-table th, .admin-table td { padding: 8px; }
+            .countdown-timer { gap: 8px; }
+            .time-box { padding: 8px 10px; min-width: 55px; }
+            .time-box .num { font-size: 1.3rem; }
         }
     </style>
 </head>
@@ -148,7 +204,6 @@
                 <button class="btn-sw" style="background:#333; color:#fff;" onclick="showAdminLogin()"><i class="fas fa-shield-alt"></i> Consejo REGCEN</button>
             </div>
 
-            <!-- Formulario de Inicio de Sesión de Usuario -->
             <div id="user-login-form" style="display:none;">
                 <div class="form-group">
                     <label class="form-label"><i class="fas fa-id-badge"></i> Código de Registro</label>
@@ -158,7 +213,6 @@
                 <button class="btn-sw btn-outline" style="width:100%;" onclick="backToLoginOptions()">Volver</button>
             </div>
 
-            <!-- Formulario de Administrador -->
             <div id="admin-login-form" style="display:none;">
                 <div class="form-group">
                     <label class="form-label"><i class="fas fa-key"></i> Contraseña del Consejo</label>
@@ -178,13 +232,10 @@
                 <p>Completa tus datos para unirte a la causa</p>
             </div>
             <form id="registration-form" onsubmit="submitRegistration(event)">
-                
-                <!-- NUEVO CAMPO: NOMBRE COMPLETO -->
                 <div class="form-group">
                     <label class="form-label"><i class="fas fa-user"></i> Nombre Completo</label>
                     <input type="text" class="form-input" id="reg-nombre" placeholder="Ej. Luke Skywalker" required>
                 </div>
-
                 <div class="form-group">
                     <label class="form-label"><i class="fas fa-globe"></i> ¿De dónde vienes?</label>
                     <select class="form-select" id="reg-origen" required>
@@ -198,13 +249,10 @@
                         <option value="Otro">Otro</option>
                     </select>
                 </div>
-
                 <div class="form-group">
                     <label class="form-label"><i class="fas fa-birthday-cake"></i> Edad</label>
                     <input type="number" class="form-input" id="reg-edad" placeholder="Ej. 25" min="10" max="99" required>
                 </div>
-
-                <!-- ETAPAS ACTUALIZADAS -->
                 <div class="form-group">
                     <label class="form-label"><i class="fas fa-graduation-cap"></i> Etapa en la que te encuentras</label>
                     <select class="form-select" id="reg-etapa" required>
@@ -217,7 +265,6 @@
                         <option value="Asesores">Asesores</option>
                     </select>
                 </div>
-
                 <div class="form-group">
                     <label class="form-label"><i class="fas fa-bed"></i> ¿Requieres hospedaje?</label>
                     <select class="form-select" id="reg-hospedaje" required>
@@ -230,7 +277,6 @@
             </form>
         </div>
 
-        <!-- Mensaje de Éxito Jedi (Código Generado) -->
         <div class="jedi-message" id="jedi-success-message">
             <h2>El Consejo te ha recibido</h2>
             <p>Tu registro ha sido enviado a la sala del Consejo. Un maestro Jedi revisará tu solicitud.</p>
@@ -265,33 +311,160 @@
                             <th>Origen</th>
                             <th>Etapa</th>
                             <th>Hospedaje</th>
+                            <th>Taller</th>
+                            <th>Staff</th>
                             <th>Código</th>
                             <th>Estado</th>
                             <th>Acción</th>
                         </tr>
                     </thead>
-                    <tbody id="admin-table-body">
-                        <!-- Se llena dinámicamente -->
-                    </tbody>
+                    <tbody id="admin-table-body"></tbody>
                 </table>
             </div>
         </div>
     </section>
 
-    <!-- SECCIÓN 5: PANTALLA DE USUARIO APROBADO -->
+    <!-- SECCIÓN 5: DASHBOARD DE USUARIO APROBADO -->
     <section id="user-approved-section" class="app-section">
-        <div class="jedi-message" style="display:block; margin-top:50px; border-color: var(--gold); box-shadow: 0 0 60px rgba(250,222,75,0.3);">
-            <h2>¡Bienvenido, Joven Padawan!</h2>
-            <p>Tu código ha sido aprobado por el Consejo.</p>
-            <p>Estás oficialmente registrado en el Encuentro Regional REGCEN.</p>
-            <p style="font-size:1.2rem; color:var(--neon-cyan); margin-top:20px;">"La Fuerza te acompañará en esta aventura."</p>
-            <button class="btn-sw" style="margin-top:30px; border-radius:8px;" onclick="logout()">Salir</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; max-width:900px; margin-left:auto; margin-right:auto;">
+            <h2 class="sw-font" style="font-size:1.8rem;">Mi Panel</h2>
+            <button class="btn-sw" onclick="logout()">Cerrar Sesión</button>
         </div>
+
+        <!-- Temporizador -->
+        <div class="countdown-container">
+            <div class="countdown-title">El evento comienza en:</div>
+            <div class="countdown-timer" id="countdown-timer">
+                <div class="time-box"><span class="num" id="days">00</span><span class="label">Días</span></div>
+                <div class="time-box"><span class="num" id="hours">00</span><span class="label">Horas</span></div>
+                <div class="time-box"><span class="num" id="minutes">00</span><span class="label">Minutos</span></div>
+                <div class="time-box"><span class="num" id="seconds">00</span><span class="label">Segundos</span></div>
+            </div>
+        </div>
+
+        <div class="user-dashboard-grid">
+            <!-- Credencial -->
+            <div class="credential-card">
+                <h3>Pase de Acceso Oficial</h3>
+                <div class="qr-sim"><i class="fas fa-qrcode"></i></div>
+                <div class="user-name" id="dash-user-name">Nombre del Usuario</div>
+                <div class="user-code" id="dash-user-code">CODIGO-XXXX</div>
+                <p style="font-size:0.75rem; color:var(--text-muted); margin-top:15px;"><i class="fas fa-check-circle" style="color:#00ff64;"></i> Código Validado por el Consejo</p>
+            </div>
+
+            <!-- Info del Evento -->
+            <div class="event-info-card">
+                <h3><i class="fas fa-jedi"></i> Detalles del Evento</h3>
+                <div class="event-detail">
+                    <i class="fas fa-calendar-alt"></i>
+                    <div><strong>Fecha</strong><span>Jueves, 5 de Febrero de 2026</span></div>
+                </div>
+                <div class="event-detail">
+                    <i class="fas fa-clock"></i>
+                    <div><strong>Horario</strong><span>9:00 AM - 6:00 PM</span></div>
+                </div>
+                <div class="event-detail">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <div><strong>Lugar</strong><span>Universidad Politécnica de San Luis Potosí<br><small style="color:var(--text-muted);">Av. Salvador Nava Martínez #1000</small></span></div>
+                </div>
+                <div class="event-detail">
+                    <i class="fas fa-info-circle"></i>
+                    <div><strong>Nota Importante</strong><span>Presenta este pase digital en la entrada. Tu código es personal e intransferible.</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Selección de Talleres -->
+        <h3 class="section-subtitle"><i class="fas fa-tools"></i> Selecciona tu Taller (Cupo Máx. 25)</h3>
+        <div class="workshop-grid" id="workshop-grid">
+            <!-- Taller 1 -->
+            <div class="workshop-card" id="ws-1" onclick="selectWorkshop(1)">
+                <div>
+                    <div class="workshop-title">Taller: Construcción de Sables</div>
+                    <div class="workshop-desc">Aprende a ensamblar tu propio sable de luz (versión de utilería) y conoce la historia de los cristales Kyber.</div>
+                    <div class="workshop-meta">
+                        <strong>Imparte:</strong> Maestro Néstor-Wan Garza<br>
+                        <strong>Aprenderás:</strong> Ensamblaje básico, electrónica simple y diseño.
+                    </div>
+                </div>
+                <div>
+                    <div class="workshop-capacity" id="cap-1">Cupo: 0 / 25</div>
+                    <div class="capacity-bar"><div class="capacity-fill" id="bar-1"></div></div>
+                    <button class="btn-sw" style="width:100%; margin-top:10px; padding:8px; font-size:0.75rem;">Seleccionar</button>
+                </div>
+            </div>
+            <!-- Taller 2 -->
+            <div class="workshop-card" id="ws-2" onclick="selectWorkshop(2)">
+                <div>
+                    <div class="workshop-title">Taller: Tácticas de Duelo</div>
+                    <div class="workshop-desc">Domina las formas de combate de sable de luz, el manejo de la Fuerza y la defensa personal.</div>
+                    <div class="workshop-meta">
+                        <strong>Imparte:</strong> Lord Sith Darth Leopoldo<br>
+                        <strong>Aprenderás:</strong> Posturas, movimientos básicos y coreografía de combate.
+                    </div>
+                </div>
+                <div>
+                    <div class="workshop-capacity" id="cap-2">Cupo: 0 / 25</div>
+                    <div class="capacity-bar"><div class="capacity-fill" id="bar-2"></div></div>
+                    <button class="btn-sw" style="width:100%; margin-top:10px; padding:8px; font-size:0.75rem;">Seleccionar</button>
+                </div>
+            </div>
+            <!-- Taller 3 -->
+            <div class="workshop-card" id="ws-3" onclick="selectWorkshop(3)">
+                <div>
+                    <div class="workshop-title">Taller: Meditación y Conexión</div>
+                    <div class="workshop-desc">Encuentra tu centro, aprende a meditar y a conectar con la Fuerza que fluye en tu interior.</div>
+                    <div class="workshop-meta">
+                        <strong>Imparte:</strong> Consejera Jedi Ayala Lorian<br>
+                        <strong>Aprenderás:</strong> Respiración, mindfulness y visualización.
+                    </div>
+                </div>
+                <div>
+                    <div class="workshop-capacity" id="cap-3">Cupo: 0 / 25</div>
+                    <div class="capacity-bar"><div class="capacity-fill" id="bar-3"></div></div>
+                    <button class="btn-sw" style="width:100%; margin-top:10px; padding:8px; font-size:0.75rem;">Seleccionar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario de Staff (Solo Coordinadores) -->
+        <div id="staff-section" style="display:none;">
+            <h3 class="section-subtitle"><i class="fas fa-users-cog"></i> Apoyo como Staff</h3>
+            <div class="staff-form">
+                <p style="color:var(--text-muted); margin-bottom:15px;">Como coordinador, puedes formar parte del equipo de apoyo del evento. Elige tu área:</p>
+                <div class="staff-options">
+                    <div class="staff-option" onclick="selectStaff('Animación', this)">
+                        <i class="fas fa-film"></i>
+                        <span>Animación</span>
+                    </div>
+                    <div class="staff-option" onclick="selectStaff('Juegos', this)">
+                        <i class="fas fa-gamepad"></i>
+                        <span>Juegos</span>
+                    </div>
+                    <div class="staff-option" onclick="selectStaff('Talleres', this)">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <span>Talleres</span>
+                    </div>
+                </div>
+                <button class="btn-sw" id="staff-save-btn" style="margin-top:20px; width:100%; display:none;" onclick="saveStaffSelection()">Confirmar Staff</button>
+            </div>
+        </div>
+
     </section>
 
     <script>
         // ============================================================
-        // AUDIO
+        // DATOS GLOBALES Y ESTADO
+        // ============================================================
+        let registros = JSON.parse(localStorage.getItem('regcen_registros')) || [];
+        let talleresCupos = JSON.parse(localStorage.getItem('regcen_talleres')) || { 1: 0, 2: 0, 3: 0 };
+        let currentUser = null;
+
+        // Configuración del evento
+        const EVENT_DATE = new Date('2026-02-05T09:00:00').getTime();
+
+        // ============================================================
+        // AUDIO Y SABLE DE LUZ
         // ============================================================
         window.addEventListener('load', () => {
             const audio = document.getElementById('bg-audio');
@@ -302,9 +475,6 @@
             if (audio && audio.paused) audio.play().catch(()=>{});
         }, { once: false });
 
-        // ============================================================
-        // SABLE DE LUZ
-        // ============================================================
         let saberOn = false;
         document.getElementById('lightsaber-container').addEventListener('click', () => {
             const s = document.getElementById('lightsaber');
@@ -388,14 +558,10 @@
         })();
 
         // ============================================================
-        // LÓGICA DE NAVEGACIÓN Y FORMULARIOS
+        // LÓGICA DE NEGOCIO Y FORMULARIOS
         // ============================================================
-        
-        let registros = JSON.parse(localStorage.getItem('regcen_registros')) || [];
-
-        function saveRegistros() {
-            localStorage.setItem('regcen_registros', JSON.stringify(registros));
-        }
+        function saveRegistros() { localStorage.setItem('regcen_registros', JSON.stringify(registros)); }
+        function saveTalleres() { localStorage.setItem('regcen_talleres', JSON.stringify(talleresCupos)); }
 
         function goToLogin() {
             executeJumpSequence(() => {
@@ -433,57 +599,28 @@
             document.getElementById('admin-login-form').style.display = 'none';
         }
 
-        // ============================================================
-        // GENERACIÓN DE CÓDIGO BASADO EN ESTADO
-        // ============================================================
         function generateCode(estado) {
-            let prefijo = 'REG'; // Por defecto
-            
-            // Diccionario de abreviaciones
-            const abreviaciones = {
-                'Pachuca': 'PCH',
-                'Aguascalientes': 'AGS',
-                'Irapuato': 'IRT',
-                'San Luis Potosí': 'SLP',
-                'Durango': 'DGO',
-                'León': 'LEO',
-                'Otro': 'OTR'
-            };
-
-            if (abreviaciones[estado]) {
-                prefijo = abreviaciones[estado];
-            }
-
+            let prefijo = 'REG';
+            const abreviaciones = { 'Pachuca': 'PCH', 'Aguascalientes': 'AGS', 'Irapuato': 'IRT', 'San Luis Potosí': 'SLP', 'Durango': 'DGO', 'León': 'LEO', 'Otro': 'OTR' };
+            if (abreviaciones[estado]) prefijo = abreviaciones[estado];
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             let sufijo = '';
-            for (let i = 0; i < 4; i++) {
-                sufijo += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            
+            for (let i = 0; i < 4; i++) sufijo += chars.charAt(Math.floor(Math.random() * chars.length));
             return prefijo + '-' + sufijo;
         }
 
         function submitRegistration(event) {
             event.preventDefault();
-            
             const nombre = document.getElementById('reg-nombre').value.trim();
             const origen = document.getElementById('reg-origen').value;
             const edad = document.getElementById('reg-edad').value;
             const etapa = document.getElementById('reg-etapa').value;
             const hospedaje = document.getElementById('reg-hospedaje').value;
-
-            // Generar código basado en el estado seleccionado
             const nuevoCodigo = generateCode(origen);
 
             const nuevoRegistro = {
-                id: Date.now(),
-                nombre: nombre,
-                origen: origen,
-                edad: edad,
-                etapa: etapa,
-                hospedaje: hospedaje,
-                codigo: nuevoCodigo,
-                aprobado: false
+                id: Date.now(), nombre, origen, edad, etapa, hospedaje, codigo: nuevoCodigo, aprobado: false,
+                tallerId: null, staff: null
             };
 
             registros.push(nuevoRegistro);
@@ -496,22 +633,17 @@
 
         function loginUser() {
             const code = document.getElementById('login-code').value.trim().toUpperCase();
-            if (!code) {
-                alert('Por favor, ingresa tu código.');
-                return;
-            }
+            if (!code) { alert('Por favor, ingresa tu código.'); return; }
 
             const registro = registros.find(r => r.codigo === code);
-            
-            if (!registro) {
-                alert('Código no encontrado. Verifica tu código o regístrate.');
-                return;
-            }
+            if (!registro) { alert('Código no encontrado. Verifica tu código o regístrate.'); return; }
 
             if (registro.aprobado) {
+                currentUser = registro;
                 executeJumpSequence(() => {
                     document.getElementById('login-section').style.display = 'none';
                     document.getElementById('user-approved-section').style.display = 'block';
+                    renderUserDashboard();
                 });
             } else {
                 alert('Tu código aún no ha sido aprobado por el Consejo. Por favor, espera o verifica tu transferencia.');
@@ -535,12 +667,10 @@
         function renderAdminTable() {
             const tbody = document.getElementById('admin-table-body');
             tbody.innerHTML = '';
-
             if (registros.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted);">No hay registros aún.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; color:var(--text-muted);">No hay registros aún.</td></tr>';
                 return;
             }
-
             registros.forEach((reg) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -548,17 +678,11 @@
                     <td>${reg.origen}</td>
                     <td>${reg.etapa}</td>
                     <td>${reg.hospedaje}</td>
+                    <td>${reg.tallerId ? 'Taller ' + reg.tallerId : '-'}</td>
+                    <td>${reg.staff ? reg.staff : '-'}</td>
                     <td style="font-family:monospace; color:var(--neon-cyan); font-weight:bold;">${reg.codigo}</td>
-                    <td>
-                        <span class="status-badge ${reg.aprobado ? 'status-approved' : 'status-pending'}">
-                            ${reg.aprobado ? 'Aprobado' : 'Pendiente'}
-                        </span>
-                    </td>
-                    <td>
-                        ${!reg.aprobado 
-                            ? `<button class="btn-sw" style="padding:4px 10px; font-size:0.7rem; border-radius:4px;" onclick="approveRegistration(${reg.id})">Aprobar</button>` 
-                            : '<span style="color:var(--text-muted); font-size:0.8rem;">Validado</span>'}
-                    </td>
+                    <td><span class="status-badge ${reg.aprobado ? 'status-approved' : 'status-pending'}">${reg.aprobado ? 'Aprobado' : 'Pendiente'}</span></td>
+                    <td>${!reg.aprobado ? `<button class="btn-sw" style="padding:4px 10px; font-size:0.7rem; border-radius:4px;" onclick="approveRegistration(${reg.id})">Aprobar</button>` : '<span style="color:var(--text-muted); font-size:0.8rem;">Validado</span>'}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -573,7 +697,162 @@
             }
         }
 
+        // ============================================================
+        // LÓGICA DEL DASHBOARD DE USUARIO
+        // ============================================================
+        function renderUserDashboard() {
+            if (!currentUser) return;
+
+            // Setear datos de la credencial
+            document.getElementById('dash-user-name').innerText = currentUser.nombre;
+            document.getElementById('dash-user-code').innerText = currentUser.codigo;
+
+            // Renderizar Talleres
+            renderWorkshops();
+
+            // Mostrar sección de Staff si aplica
+            const staffSection = document.getElementById('staff-section');
+            if (currentUser.etapa === 'Pre-coordinadores' || currentUser.etapa === 'Coordinadores') {
+                staffSection.style.display = 'block';
+                if (currentUser.staff) {
+                    // Marcar el seleccionado previamente
+                    document.querySelectorAll('.staff-option').forEach(opt => {
+                        if (opt.innerText.trim().includes(currentUser.staff)) {
+                            opt.classList.add('selected');
+                        } else {
+                            opt.classList.remove('selected');
+                        }
+                    });
+                    document.getElementById('staff-save-btn').style.display = 'block';
+                }
+            } else {
+                staffSection.style.display = 'none';
+            }
+
+            // Iniciar Temporizador
+            startCountdown();
+        }
+
+        function renderWorkshops() {
+            const talleresInfo = {
+                1: { max: 25 },
+                2: { max: 25 },
+                3: { max: 25 }
+            };
+
+            for (let id = 1; id <= 3; id++) {
+                const capEl = document.getElementById('cap-' + id);
+                const barEl = document.getElementById('bar-' + id);
+                const cardEl = document.getElementById('ws-' + id);
+                const btnEl = cardEl.querySelector('button');
+                
+                const cupoActual = talleresCupos[id];
+                const max = talleresInfo[id].max;
+
+                capEl.innerText = `Cupo: ${cupoActual} / ${max}`;
+                barEl.style.width = `${(cupoActual / max) * 100}%`;
+
+                // Lógica visual
+                cardEl.classList.remove('selected', 'full');
+                btnEl.innerText = 'Seleccionar';
+                btnEl.disabled = false;
+
+                if (currentUser.tallerId === id) {
+                    cardEl.classList.add('selected');
+                    btnEl.innerText = 'Seleccionado';
+                    btnEl.disabled = true;
+                } else if (cupoActual >= max) {
+                    cardEl.classList.add('full');
+                    btnEl.innerText = 'Lleno';
+                    btnEl.disabled = true;
+                } else if (currentUser.tallerId !== null) {
+                    // Si ya tiene uno, no puede elegir otro (a menos que quieras permitir cambio, aquí lo bloqueamos)
+                    btnEl.innerText = 'Ya tienes uno';
+                    btnEl.disabled = true;
+                }
+            }
+        }
+
+        function selectWorkshop(id) {
+            if (!currentUser) return;
+            if (currentUser.tallerId !== null) {
+                alert('Ya has seleccionado un taller. Contacta al Consejo si necesitas cambiarlo.');
+                return;
+            }
+
+            const max = 25;
+            if (talleresCupos[id] >= max) {
+                alert('Este taller ya está lleno.');
+                return;
+            }
+
+            // Actualizar cupos
+            talleresCupos[id]++;
+            currentUser.tallerId = id;
+
+            // Guardar
+            saveTalleres();
+            const idx = registros.findIndex(r => r.id === currentUser.id);
+            if (idx !== -1) { registros[idx] = currentUser; saveRegistros(); }
+
+            // Refrescar UI
+            renderWorkshops();
+            alert('¡Taller seleccionado con éxito!');
+        }
+
+        function selectStaff(area, element) {
+            document.querySelectorAll('.staff-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            document.getElementById('staff-save-btn').style.display = 'block';
+            document.getElementById('staff-save-btn').dataset.area = area;
+        }
+
+        function saveStaffSelection() {
+            if (!currentUser) return;
+            const btn = document.getElementById('staff-save-btn');
+            const area = btn.dataset.area;
+            if (!area) return;
+
+            currentUser.staff = area;
+            const idx = registros.findIndex(r => r.id === currentUser.id);
+            if (idx !== -1) { registros[idx] = currentUser; saveRegistros(); }
+            
+            alert('Te has unido al staff en: ' + area);
+            btn.style.display = 'none'; // Ocultar tras guardar
+        }
+
+        // ============================================================
+        // TEMPORIZADOR
+        // ============================================================
+        let countdownInterval;
+        function startCountdown() {
+            if (countdownInterval) clearInterval(countdownInterval);
+            
+            countdownInterval = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = EVENT_DATE - now;
+
+                if (distance < 0) {
+                    clearInterval(countdownInterval);
+                    document.getElementById('countdown-timer').innerHTML = '<div style="color:var(--gold); font-family:Montserrat; font-size:1.2rem;">¡EL EVENTO HA COMENZADO!</div>';
+                    return;
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById('days').innerText = String(days).padStart(2, '0');
+                document.getElementById('hours').innerText = String(hours).padStart(2, '0');
+                document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
+                document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
+            }, 1000);
+        }
+
         function logout() {
+            currentUser = null;
+            if (countdownInterval) clearInterval(countdownInterval);
             executeJumpSequence(() => {
                 document.querySelectorAll('.app-section').forEach(s => s.style.display = 'none');
                 document.getElementById('hero-section').style.display = 'flex';
@@ -603,4 +882,3 @@
     </script>
 </body>
 </html>
-```

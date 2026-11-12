@@ -107,14 +107,15 @@
         .credential-card h3 { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1rem; color: var(--gold); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; }
         .qr-container { background: #fff; padding: 10px; border-radius: 8px; display: inline-block; margin: 15px auto; }
         .credential-card .user-name { font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
-        .credential-card .user-code { font-family: monospace; color: var(--neon-cyan); font-weight: bold; font-size: 1.1rem; letter-spacing: 1px; background: rgba(0,243,255,0.1); padding: 4px 10px; border-radius: 6px; display: inline-block; }
+        .credential-card .user-code { font-family: monospace; color: var(--neon-cyan); font-weight: bold; font-size: 1.1rem; letter-spacing: 1px; background: rgba(0,243,255,0.1); padding: 4px 10px; border-radius: 6px; display: inline-block; cursor: pointer; transition: all 0.2s; }
+        .credential-card .user-code:hover { background: rgba(0,243,255,0.2); }
 
         .event-info-card { background: var(--sw-gray); border: 1px solid var(--sw-border); border-radius: 16px; padding: 25px; }
         .event-info-card h3 { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.2rem; color: var(--accent-color); text-transform: uppercase; margin-bottom: 15px; border-bottom: 1px solid var(--sw-border); padding-bottom: 10px; }
         .event-detail { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 15px; }
         .event-detail i { font-size: 1.2rem; color: var(--gold); margin-top: 3px; width: 20px; text-align: center; }
         .event-detail div strong { display: block; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-        .event-detail div span { font-size: 1.05rem; color: var(--text-bright); }
+        .event-detail div span { font-size: 1.05rem; color: var(--text-bright); line-height: 1.3; }
 
         /* --- TEMPORIZADOR --- */
         .countdown-container { text-align: center; margin: 20px auto; max-width: 900px; padding: 20px; background: rgba(0,0,0,0.5); border-radius: 12px; border: 1px dashed var(--sw-border); }
@@ -150,6 +151,15 @@
         .staff-option i { font-size: 1.5rem; color: var(--accent-color); margin-bottom: 10px; display: block; }
         .staff-option span { font-weight: 700; font-size: 0.9rem; text-transform: uppercase; }
 
+        /* --- TOASTS / NOTIFICACIONES --- */
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: rgba(0,0,0,0.9); border-left: 4px solid var(--accent-color); color: #fff; padding: 12px 20px; border-radius: 6px; font-family: 'Rajdhani', sans-serif; font-size: 0.9rem; box-shadow: 0 5px 15px rgba(0,0,0,0.5); animation: slideIn 0.3s ease forwards; display: flex; align-items: center; gap: 10px; }
+        .toast.success { border-left-color: #00ff64; }
+        .toast.error { border-left-color: #ff3333; }
+        .toast.info { border-left-color: var(--gold); }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+
         .lightsaber-container { position: fixed; bottom: 30px; left: 20px; z-index: 750; display: block; cursor: pointer; transition: transform 0.3s ease; }
         .lightsaber-container:hover { transform: scale(1.1) rotate(-5deg); }
         .lightsaber { width: 6px; height: 70px; background: var(--accent-color); border-radius: 3px; box-shadow: 0 0 30px var(--faction-glow), 0 0 60px var(--faction-glow); animation: saberPulse 0.8s ease-in-out infinite alternate; transform-origin: bottom; transform: rotate(-20deg); }
@@ -175,6 +185,8 @@
             .countdown-timer { gap: 8px; }
             .time-box { padding: 8px 10px; min-width: 55px; }
             .time-box .num { font-size: 1.3rem; }
+            #toast-container { bottom: 10px; right: 10px; left: 10px; align-items: center; }
+            .toast { width: 100%; justify-content: center; }
         }
     </style>
 </head>
@@ -183,6 +195,7 @@
     <div id="flash-overlay"></div>
     <canvas id="hyperspace"></canvas>
     <div id="particles-container"></div>
+    <div id="toast-container"></div>
 
     <div class="lightsaber-container" id="lightsaber-container">
         <div class="lightsaber" id="lightsaber"></div>
@@ -312,7 +325,6 @@
             <button class="btn-sw" onclick="logout()">Cerrar Sesión</button>
         </div>
         
-        <!-- Estadísticas -->
         <div class="stats-grid" id="admin-stats">
             <div class="stat-card"><h4>Total Registros</h4><div class="value" id="stat-total">0</div></div>
             <div class="stat-card"><h4>Aprobados</h4><div class="value" id="stat-approved" style="color:#00ff64;">0</div></div>
@@ -365,7 +377,7 @@
                 <h3>Pase de Acceso Oficial</h3>
                 <div id="qrcode" class="qr-container"></div>
                 <div class="user-name" id="dash-user-name">Nombre del Usuario</div>
-                <div class="user-code" id="dash-user-code">CODIGO-XXXX</div>
+                <div class="user-code" id="dash-user-code" onclick="copyCode()" title="Clic para copiar">CODIGO-XXXX</div>
                 <p style="font-size:0.75rem; color:var(--text-muted); margin-top:15px;"><i class="fas fa-check-circle" style="color:#00ff64;"></i> Código Validado por el Consejo</p>
                 <p style="font-size:0.65rem; color:var(--text-muted); margin-top:5px;">Escanea este código en la entrada.</p>
             </div>
@@ -379,11 +391,18 @@
                 </div>
                 <div class="event-detail">
                     <i class="fas fa-clock"></i>
-                    <div><strong>Horario</strong><span>9:00 AM - 6:00 PM</span></div>
+                    <div><strong>Horario</strong><span>A partir de las 16:00 hrs</span></div>
                 </div>
                 <div class="event-detail">
                     <i class="fas fa-map-marker-alt"></i>
-                    <div><strong>Lugar</strong><span>Universidad Politécnica de San Luis Potosí<br><small style="color:var(--text-muted);">Av. Salvador Nava Martínez #1000</small></span></div>
+                    <div>
+                        <strong>Lugar</strong>
+                        <span>
+                            Calle Francisco Sarabia No. 511, Col. Fracc Niños Héroes<br>
+                            <small style="color:var(--text-muted);">Ref: Calle Río Grijalva, Blvd. Díaz Ordaz, Av. Lázaro Cárdenas, Manzana 017</small><br>
+                            <small style="color:var(--accent-color); font-weight:bold;">Irapuato, Guanajuato, C.P. 36660</small>
+                        </span>
+                    </div>
                 </div>
                 <div class="event-detail">
                     <i class="fas fa-info-circle"></i>
@@ -428,8 +447,8 @@
         let registros = JSON.parse(localStorage.getItem('regcen_registros')) || [];
         let currentUser = null;
 
-        // Configuración del evento (5 de Febrero de 2027 a las 9:00 AM)
-        const EVENT_DATE = new Date('2027-02-05T09:00:00').getTime();
+        // Configuración del evento (5 de Febrero de 2027 a las 16:00 hrs)
+        const EVENT_DATE = new Date('2027-02-05T16:00:00').getTime();
 
         // Lista de Talleres
         const LISTA_TALLERES = [
@@ -438,13 +457,34 @@
         ];
 
         // ============================================================
+        // TOASTS (NOTIFICACIONES)
+        // ============================================================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            let icon = 'fa-info-circle';
+            if (type === 'success') icon = 'fa-check-circle';
+            if (type === 'error') icon = 'fa-exclamation-circle';
+
+            toast.innerHTML = `<i class="fas ${icon}"></i> <span>${message}</span>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ============================================================
         // AUDIO Y SABLE DE LUZ
         // ============================================================
         window.addEventListener('load', () => {
             const audio = document.getElementById('bg-audio');
             if (audio) { audio.volume = 0.15; audio.loop = true; audio.play().catch(()=>{}); }
             
-            // Auto-Login si viene por QR
+            // Auto-Login si viene por QR (Opcional, aunque el QR ahora es texto)
             const urlParams = new URLSearchParams(window.location.search);
             const autoCode = urlParams.get('auto_login');
             if (autoCode) {
@@ -622,10 +662,10 @@
 
         function loginUser() {
             const code = document.getElementById('login-code').value.trim().toUpperCase();
-            if (!code) { alert('Por favor, ingresa tu código.'); return; }
+            if (!code) { showToast('Por favor, ingresa tu código.', 'error'); return; }
 
             const registro = registros.find(r => r.codigo === code);
-            if (!registro) { alert('Código no encontrado. Verifica tu código o regístrate.'); return; }
+            if (!registro) { showToast('Código no encontrado. Verifica tu código o regístrate.', 'error'); return; }
 
             if (registro.aprobado) {
                 currentUser = registro;
@@ -635,7 +675,7 @@
                     renderUserDashboard();
                 });
             } else {
-                alert('Tu código aún no ha sido aprobado por el Consejo. Por favor, espera o verifica tu transferencia.');
+                showToast('Tu código aún no ha sido aprobado por el Consejo.', 'error');
             }
         }
 
@@ -649,7 +689,7 @@
                     renderAdminDashboard();
                 });
             } else {
-                alert('Contraseña incorrecta. Acceso denegado.');
+                showToast('Contraseña incorrecta. Acceso denegado.', 'error');
             }
         }
 
@@ -657,7 +697,6 @@
         // RENDERIZADO DEL DASHBOARD ADMIN
         // ============================================================
         function renderAdminDashboard() {
-            // Stats
             const total = registros.length;
             const aprobados = registros.filter(r => r.aprobado).length;
             const pendientes = total - aprobados;
@@ -668,7 +707,6 @@
             document.getElementById('stat-pending').innerText = pendientes;
             document.getElementById('stat-workshops').innerText = conTalleres;
 
-            // Tabla
             const tbody = document.getElementById('admin-table-body');
             tbody.innerHTML = '';
             if (registros.length === 0) {
@@ -676,7 +714,6 @@
                 return;
             }
             
-            // Ordenar: Pendientes primero, luego aprobados
             const sortedRegistros = [...registros].sort((a, b) => a.aprobado - b.aprobado);
 
             sortedRegistros.forEach((reg) => {
@@ -706,6 +743,7 @@
                 registros[index].aprobado = true;
                 saveRegistros();
                 renderAdminDashboard();
+                showToast('Registro aprobado exitosamente.', 'success');
             }
         }
 
@@ -718,19 +756,32 @@
             document.getElementById('dash-user-name').innerText = currentUser.nombre;
             document.getElementById('dash-user-code').innerText = currentUser.codigo;
 
-            // Generar QR
+            // Generar QR con los datos del participante (Texto estructurado para escanear)
             const qrContainer = document.getElementById('qrcode');
             qrContainer.innerHTML = ''; // Limpiar
-            const currentUrl = window.location.href.split('?')[0]; // Obtener URL base
-            const qrData = `${currentUrl}?auto_login=${currentUser.codigo}`;
+            
+            const talleresTexto = currentUser.talleresElegidos.length > 0 
+                ? currentUser.talleresElegidos.map(id => LISTA_TALLERES[id]).join(', ') 
+                : 'Ninguno';
+            
+            // Formato de texto para el QR (Se puede leer con cualquier app de escáner)
+            const qrData = 
+`=== PASE DE ACCESO REGCEN ===
+Nombre: ${currentUser.nombre}
+Código: ${currentUser.codigo}
+Procedencia: ${currentUser.origen}
+Etapa: ${currentUser.etapa}
+Talleres: ${talleresTexto}
+Staff: ${currentUser.staff || 'N/A'}
+=============================`;
             
             new QRCode(qrContainer, {
                 text: qrData,
-                width: 120,
-                height: 120,
+                width: 140,
+                height: 140,
                 colorDark : "#000000",
                 colorLight : "#ffffff",
-                correctLevel : QRCode.CorrectLevel.H
+                correctLevel : QRCode.CorrectLevel.L // Usar L para que quepa más texto
             });
 
             // Renderizar Talleres
@@ -755,14 +806,22 @@
             startCountdown();
         }
 
+        function copyCode() {
+            if (!currentUser) return;
+            navigator.clipboard.writeText(currentUser.codigo).then(() => {
+                showToast('Código copiado al portapapeles', 'success');
+            }).catch(() => {
+                showToast('Error al copiar el código', 'error');
+            });
+        }
+
         function renderWorkshops() {
             const grid = document.getElementById('workshop-grid');
             grid.innerHTML = '';
 
             LISTA_TALLERES.forEach((nombre, index) => {
-                const id = index; // 0 a 8
+                const id = index; 
                 
-                // Contar cuántos usuarios han elegido este taller
                 const count = registros.filter(r => r.talleresElegidos && r.talleresElegidos.includes(id)).length;
                 const isFull = count >= 25;
                 const isSelected = currentUser.talleresElegidos.includes(id);
@@ -790,28 +849,27 @@
             const index = currentUser.talleresElegidos.indexOf(id);
 
             if (index !== -1) {
-                // Deseleccionar
                 currentUser.talleresElegidos.splice(index, 1);
+                showToast('Taller deseleccionado');
             } else {
-                // Seleccionar
                 if (currentUser.talleresElegidos.length >= 2) {
-                    alert('Solo puedes elegir 2 talleres. Desmarca uno para cambiar.');
+                    showToast('Solo puedes elegir 2 talleres. Desmarca uno para cambiar.', 'error');
                     return;
                 }
-                // Verificar cupo
                 const count = registros.filter(r => r.talleresElegidos && r.talleresElegidos.includes(id)).length;
                 if (count >= 25) {
-                    alert('Este taller ya está lleno.');
+                    showToast('Este taller ya está lleno.', 'error');
                     return;
                 }
                 currentUser.talleresElegidos.push(id);
+                showToast('Taller seleccionado con éxito', 'success');
             }
 
-            // Guardar en el arreglo principal
             const idx = registros.findIndex(r => r.id === currentUser.id);
             if (idx !== -1) { registros[idx] = currentUser; saveRegistros(); }
 
-            renderWorkshops();
+            // Refrescar QR y talleres
+            renderUserDashboard();
         }
 
         function selectStaff(area, element) {
@@ -831,12 +889,12 @@
             const idx = registros.findIndex(r => r.id === currentUser.id);
             if (idx !== -1) { registros[idx] = currentUser; saveRegistros(); }
             
-            alert('Te has unido al staff en: ' + area);
-            btn.style.display = 'none';
+            showToast('Te has unido al staff en: ' + area, 'success');
+            renderUserDashboard(); // Refrescar QR
         }
 
         // ============================================================
-        // TEMPORIZADOR (5 FEB 2027)
+        // TEMPORIZADOR (5 FEB 2027, 16:00 hrs)
         // ============================================================
         let countdownInterval;
         function startCountdown() {
@@ -867,7 +925,6 @@
         function logout() {
             currentUser = null;
             if (countdownInterval) clearInterval(countdownInterval);
-            // Limpiar URL param
             window.history.replaceState({}, document.title, window.location.pathname);
             executeJumpSequence(() => {
                 document.querySelectorAll('.app-section').forEach(s => s.style.display = 'none');

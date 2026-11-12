@@ -8,6 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,900;1,900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- Librería para generar códigos QR -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
             --neon-cyan: #00f3ff;
@@ -71,14 +73,21 @@
         .form-input, .form-select { width: 100%; background: #000; border: 1px solid var(--sw-border); padding: 12px 16px; color: #ffffff; font-family: 'Rajdhani', sans-serif; font-size: 1rem; border-radius: 8px; transition: border-color 0.3s ease; }
         .form-input:focus, .form-select:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 10px var(--faction-glow); }
         .form-select option { background: #151515; color: #fff; }
+
+        /* Dashboard Admin Mejorado */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: var(--sw-gray); border: 1px solid var(--sw-border); border-radius: 12px; padding: 15px; text-align: center; }
+        .stat-card h4 { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .stat-card .value { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.8rem; color: var(--accent-color); }
         
-        .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: var(--sw-gray); border-radius: 10px; overflow: hidden; font-size: 0.9rem; }
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: var(--sw-gray); border-radius: 10px; overflow: hidden; font-size: 0.85rem; }
         .admin-table th, .admin-table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--sw-border); }
-        .admin-table th { background: #222; color: var(--accent-color); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; }
+        .admin-table th { background: #222; color: var(--accent-color); text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1px; }
         .admin-table tr:hover { background: #1a1a1a; }
         .status-badge { padding: 4px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; }
         .status-approved { background: rgba(0, 255, 100, 0.2); color: #00ff64; border: 1px solid #00ff64; }
         .status-pending { background: rgba(255, 200, 0, 0.2); color: #ffc800; border: 1px solid #ffc800; }
+        .badge-staff { background: rgba(250, 222, 75, 0.2); color: var(--gold); border: 1px solid var(--gold); padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; }
 
         .jedi-message { display: none; text-align: center; padding: 40px 20px; max-width: 600px; margin: 0 auto; background: rgba(0,0,0,0.8); border: 2px solid var(--neon-cyan); border-radius: 16px; box-shadow: 0 0 50px var(--faction-glow); }
         .jedi-message h2 { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.8rem; color: var(--gold); margin-bottom: 20px; text-transform: uppercase; animation: glowPulse 2s infinite alternate; }
@@ -96,7 +105,7 @@
         @keyframes shine { 0% { transform: translateX(-100%) rotate(45deg); } 100% { transform: translateX(100%) rotate(45deg); } }
         
         .credential-card h3 { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1rem; color: var(--gold); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; }
-        .credential-card .qr-sim { width: 100px; height: 100px; background: #fff; margin: 15px auto; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; color: #000; }
+        .qr-container { background: #fff; padding: 10px; border-radius: 8px; display: inline-block; margin: 15px auto; }
         .credential-card .user-name { font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
         .credential-card .user-code { font-family: monospace; color: var(--neon-cyan); font-weight: bold; font-size: 1.1rem; letter-spacing: 1px; background: rgba(0,243,255,0.1); padding: 4px 10px; border-radius: 6px; display: inline-block; }
 
@@ -108,31 +117,33 @@
         .event-detail div span { font-size: 1.05rem; color: var(--text-bright); }
 
         /* --- TEMPORIZADOR --- */
-        .countdown-container { text-align: center; margin: 20px 0; padding: 20px; background: rgba(0,0,0,0.5); border-radius: 12px; border: 1px dashed var(--sw-border); }
+        .countdown-container { text-align: center; margin: 20px auto; max-width: 900px; padding: 20px; background: rgba(0,0,0,0.5); border-radius: 12px; border: 1px dashed var(--sw-border); }
         .countdown-title { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.2rem; color: var(--gold); margin-bottom: 15px; text-transform: uppercase; }
         .countdown-timer { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
         .time-box { background: var(--sw-gray); border: 1px solid var(--accent-color); padding: 10px 15px; border-radius: 8px; min-width: 70px; box-shadow: 0 0 15px var(--faction-glow); }
         .time-box .num { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.8rem; color: #fff; display: block; line-height: 1; }
         .time-box .label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
 
-        /* --- TALLERES Y STAFF --- */
+        /* --- TALLERES --- */
         .section-subtitle { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.3rem; color: var(--gold); text-transform: uppercase; margin: 30px auto 15px auto; max-width: 900px; border-left: 4px solid var(--accent-color); padding-left: 10px; }
         
-        .workshop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; max-width: 900px; margin: 0 auto; }
-        .workshop-card { background: var(--sw-gray); border: 1px solid var(--sw-border); border-radius: 12px; padding: 20px; transition: all 0.3s ease; display: flex; flex-direction: column; justify-content: space-between; }
-        .workshop-card:hover { border-color: var(--accent-color); transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .workshop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; max-width: 900px; margin: 0 auto; }
+        .workshop-card { background: var(--sw-gray); border: 1px solid var(--sw-border); border-radius: 12px; padding: 15px; transition: all 0.3s ease; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+        .workshop-card:hover { border-color: var(--accent-color); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         .workshop-card.selected { border-color: var(--gold); box-shadow: 0 0 20px rgba(250,222,75,0.3); }
         .workshop-card.full { opacity: 0.5; filter: grayscale(1); pointer-events: none; }
-        .workshop-title { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1rem; color: var(--accent-color); margin-bottom: 10px; }
-        .workshop-desc { font-size: 0.85rem; color: var(--text-bright); margin-bottom: 10px; line-height: 1.4; }
-        .workshop-meta { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px; }
-        .workshop-meta strong { color: var(--gold); }
-        .workshop-capacity { font-size: 0.8rem; font-weight: 700; margin-bottom: 10px; text-align: center; }
-        .capacity-bar { width: 100%; height: 6px; background: #333; border-radius: 3px; overflow: hidden; margin-top: 5px; }
+        .workshop-title { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 0.95rem; color: var(--accent-color); margin-bottom: 8px; }
+        .workshop-capacity { font-size: 0.75rem; font-weight: 700; margin-bottom: 8px; text-align: right; color: var(--text-muted); }
+        .capacity-bar { width: 100%; height: 4px; background: #333; border-radius: 2px; overflow: hidden; margin-bottom: 10px; }
         .capacity-fill { height: 100%; background: var(--neon-cyan); width: 0%; transition: width 0.3s; }
+        .btn-select-ws { background: transparent; border: 1px solid var(--accent-color); color: var(--accent-color); padding: 6px; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 0.75rem; transition: all 0.3s; width: 100%; }
+        .btn-select-ws:hover { background: var(--accent-color); color: #000; }
+        .btn-select-ws.selected-btn { background: var(--gold); border-color: var(--gold); color: #000; cursor: default; }
+        .btn-select-ws:disabled { border-color: #555; color: #555; cursor: not-allowed; background: transparent; }
 
+        /* --- STAFF --- */
         .staff-form { max-width: 900px; margin: 0 auto; background: var(--sw-gray); border: 1px solid var(--sw-border); border-radius: 12px; padding: 20px; }
-        .staff-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
+        .staff-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 15px; }
         .staff-option { background: #000; border: 1px solid var(--sw-border); padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; transition: all 0.3s ease; }
         .staff-option:hover { border-color: var(--accent-color); }
         .staff-option.selected { border-color: var(--gold); background: rgba(250,222,75,0.05); }
@@ -159,8 +170,8 @@
             .form-container { padding: 20px; }
             .lightsaber-container { bottom: 20px; left: 10px; }
             .lightsaber { height: 50px; }
-            .admin-table { font-size: 0.75rem; }
-            .admin-table th, .admin-table td { padding: 8px; }
+            .admin-table { font-size: 0.7rem; }
+            .admin-table th, .admin-table td { padding: 6px; }
             .countdown-timer { gap: 8px; }
             .time-box { padding: 8px 10px; min-width: 55px; }
             .time-box .num { font-size: 1.3rem; }
@@ -301,6 +312,14 @@
             <button class="btn-sw" onclick="logout()">Cerrar Sesión</button>
         </div>
         
+        <!-- Estadísticas -->
+        <div class="stats-grid" id="admin-stats">
+            <div class="stat-card"><h4>Total Registros</h4><div class="value" id="stat-total">0</div></div>
+            <div class="stat-card"><h4>Aprobados</h4><div class="value" id="stat-approved" style="color:#00ff64;">0</div></div>
+            <div class="stat-card"><h4>Pendientes</h4><div class="value" id="stat-pending" style="color:#ffc800;">0</div></div>
+            <div class="stat-card"><h4>Talleres Elegidos</h4><div class="value" id="stat-workshops" style="color:var(--gold);">0</div></div>
+        </div>
+
         <div style="background:var(--sw-gray); padding:20px; border-radius:12px; border:1px solid var(--sw-border);">
             <p style="margin-bottom:15px; color:var(--text-muted);">Registros de candidatos. Valida su pago para aprobar su código.</p>
             <div style="overflow-x:auto;">
@@ -308,12 +327,10 @@
                     <thead>
                         <tr>
                             <th>Nombre</th>
-                            <th>Origen</th>
-                            <th>Etapa</th>
-                            <th>Hospedaje</th>
-                            <th>Taller</th>
-                            <th>Staff</th>
                             <th>Código</th>
+                            <th>Etapa</th>
+                            <th>Talleres</th>
+                            <th>Staff</th>
                             <th>Estado</th>
                             <th>Acción</th>
                         </tr>
@@ -343,13 +360,14 @@
         </div>
 
         <div class="user-dashboard-grid">
-            <!-- Credencial -->
+            <!-- Credencial con QR -->
             <div class="credential-card">
                 <h3>Pase de Acceso Oficial</h3>
-                <div class="qr-sim"><i class="fas fa-qrcode"></i></div>
+                <div id="qrcode" class="qr-container"></div>
                 <div class="user-name" id="dash-user-name">Nombre del Usuario</div>
                 <div class="user-code" id="dash-user-code">CODIGO-XXXX</div>
                 <p style="font-size:0.75rem; color:var(--text-muted); margin-top:15px;"><i class="fas fa-check-circle" style="color:#00ff64;"></i> Código Validado por el Consejo</p>
+                <p style="font-size:0.65rem; color:var(--text-muted); margin-top:5px;">Escanea este código en la entrada.</p>
             </div>
 
             <!-- Info del Evento -->
@@ -357,7 +375,7 @@
                 <h3><i class="fas fa-jedi"></i> Detalles del Evento</h3>
                 <div class="event-detail">
                     <i class="fas fa-calendar-alt"></i>
-                    <div><strong>Fecha</strong><span>Jueves, 5 de Febrero de 2026</span></div>
+                    <div><strong>Fecha</strong><span>Viernes, 5 de Febrero de 2027</span></div>
                 </div>
                 <div class="event-detail">
                     <i class="fas fa-clock"></i>
@@ -369,63 +387,14 @@
                 </div>
                 <div class="event-detail">
                     <i class="fas fa-info-circle"></i>
-                    <div><strong>Nota Importante</strong><span>Presenta este pase digital en la entrada. Tu código es personal e intransferible.</span></div>
+                    <div><strong>Nota Importante</strong><span>Presenta este pase digital (o el código QR) en la entrada. Tu código es personal e intransferible.</span></div>
                 </div>
             </div>
         </div>
 
         <!-- Selección de Talleres -->
-        <h3 class="section-subtitle"><i class="fas fa-tools"></i> Selecciona tu Taller (Cupo Máx. 25)</h3>
-        <div class="workshop-grid" id="workshop-grid">
-            <!-- Taller 1 -->
-            <div class="workshop-card" id="ws-1" onclick="selectWorkshop(1)">
-                <div>
-                    <div class="workshop-title">Taller: Construcción de Sables</div>
-                    <div class="workshop-desc">Aprende a ensamblar tu propio sable de luz (versión de utilería) y conoce la historia de los cristales Kyber.</div>
-                    <div class="workshop-meta">
-                        <strong>Imparte:</strong> Maestro Néstor-Wan Garza<br>
-                        <strong>Aprenderás:</strong> Ensamblaje básico, electrónica simple y diseño.
-                    </div>
-                </div>
-                <div>
-                    <div class="workshop-capacity" id="cap-1">Cupo: 0 / 25</div>
-                    <div class="capacity-bar"><div class="capacity-fill" id="bar-1"></div></div>
-                    <button class="btn-sw" style="width:100%; margin-top:10px; padding:8px; font-size:0.75rem;">Seleccionar</button>
-                </div>
-            </div>
-            <!-- Taller 2 -->
-            <div class="workshop-card" id="ws-2" onclick="selectWorkshop(2)">
-                <div>
-                    <div class="workshop-title">Taller: Tácticas de Duelo</div>
-                    <div class="workshop-desc">Domina las formas de combate de sable de luz, el manejo de la Fuerza y la defensa personal.</div>
-                    <div class="workshop-meta">
-                        <strong>Imparte:</strong> Lord Sith Darth Leopoldo<br>
-                        <strong>Aprenderás:</strong> Posturas, movimientos básicos y coreografía de combate.
-                    </div>
-                </div>
-                <div>
-                    <div class="workshop-capacity" id="cap-2">Cupo: 0 / 25</div>
-                    <div class="capacity-bar"><div class="capacity-fill" id="bar-2"></div></div>
-                    <button class="btn-sw" style="width:100%; margin-top:10px; padding:8px; font-size:0.75rem;">Seleccionar</button>
-                </div>
-            </div>
-            <!-- Taller 3 -->
-            <div class="workshop-card" id="ws-3" onclick="selectWorkshop(3)">
-                <div>
-                    <div class="workshop-title">Taller: Meditación y Conexión</div>
-                    <div class="workshop-desc">Encuentra tu centro, aprende a meditar y a conectar con la Fuerza que fluye en tu interior.</div>
-                    <div class="workshop-meta">
-                        <strong>Imparte:</strong> Consejera Jedi Ayala Lorian<br>
-                        <strong>Aprenderás:</strong> Respiración, mindfulness y visualización.
-                    </div>
-                </div>
-                <div>
-                    <div class="workshop-capacity" id="cap-3">Cupo: 0 / 25</div>
-                    <div class="capacity-bar"><div class="capacity-fill" id="bar-3"></div></div>
-                    <button class="btn-sw" style="width:100%; margin-top:10px; padding:8px; font-size:0.75rem;">Seleccionar</button>
-                </div>
-            </div>
-        </div>
+        <h3 class="section-subtitle"><i class="fas fa-tools"></i> Selecciona 2 Talleres (Cupo Máx. 25 por taller)</h3>
+        <div class="workshop-grid" id="workshop-grid"></div>
 
         <!-- Formulario de Staff (Solo Coordinadores) -->
         <div id="staff-section" style="display:none;">
@@ -457,11 +426,16 @@
         // DATOS GLOBALES Y ESTADO
         // ============================================================
         let registros = JSON.parse(localStorage.getItem('regcen_registros')) || [];
-        let talleresCupos = JSON.parse(localStorage.getItem('regcen_talleres')) || { 1: 0, 2: 0, 3: 0 };
         let currentUser = null;
 
-        // Configuración del evento
-        const EVENT_DATE = new Date('2026-02-05T09:00:00').getTime();
+        // Configuración del evento (5 de Febrero de 2027 a las 9:00 AM)
+        const EVENT_DATE = new Date('2027-02-05T09:00:00').getTime();
+
+        // Lista de Talleres
+        const LISTA_TALLERES = [
+            "Pintura/dibujo", "Baile", "Teatro", "Repostería", "Fotografía", 
+            "Bisutería", "Cerámica", "Hojas recicladas", "Música"
+        ];
 
         // ============================================================
         // AUDIO Y SABLE DE LUZ
@@ -469,7 +443,24 @@
         window.addEventListener('load', () => {
             const audio = document.getElementById('bg-audio');
             if (audio) { audio.volume = 0.15; audio.loop = true; audio.play().catch(()=>{}); }
+            
+            // Auto-Login si viene por QR
+            const urlParams = new URLSearchParams(window.location.search);
+            const autoCode = urlParams.get('auto_login');
+            if (autoCode) {
+                const reg = registros.find(r => r.codigo === autoCode);
+                if (reg && reg.aprobado) {
+                    currentUser = reg;
+                    executeJumpSequence(() => {
+                        document.getElementById('hero-section').style.display = 'none';
+                        document.getElementById('login-section').style.display = 'none';
+                        document.getElementById('user-approved-section').style.display = 'block';
+                        renderUserDashboard();
+                    });
+                }
+            }
         });
+
         document.addEventListener('click', () => {
             const audio = document.getElementById('bg-audio');
             if (audio && audio.paused) audio.play().catch(()=>{});
@@ -541,7 +532,6 @@
         initStars();
         animateStars();
 
-        // Partículas flotantes
         (function createParticles() {
             const container = document.getElementById('particles-container');
             for (let i=0; i<30; i++) {
@@ -558,10 +548,9 @@
         })();
 
         // ============================================================
-        // LÓGICA DE NEGOCIO Y FORMULARIOS
+        // LÓGICA DE NEGOCIO
         // ============================================================
         function saveRegistros() { localStorage.setItem('regcen_registros', JSON.stringify(registros)); }
-        function saveTalleres() { localStorage.setItem('regcen_talleres', JSON.stringify(talleresCupos)); }
 
         function goToLogin() {
             executeJumpSequence(() => {
@@ -620,7 +609,7 @@
 
             const nuevoRegistro = {
                 id: Date.now(), nombre, origen, edad, etapa, hospedaje, codigo: nuevoCodigo, aprobado: false,
-                tallerId: null, staff: null
+                talleresElegidos: [], staff: null
             };
 
             registros.push(nuevoRegistro);
@@ -657,30 +646,53 @@
                 executeJumpSequence(() => {
                     document.getElementById('login-section').style.display = 'none';
                     document.getElementById('admin-dashboard').style.display = 'block';
-                    renderAdminTable();
+                    renderAdminDashboard();
                 });
             } else {
                 alert('Contraseña incorrecta. Acceso denegado.');
             }
         }
 
-        function renderAdminTable() {
+        // ============================================================
+        // RENDERIZADO DEL DASHBOARD ADMIN
+        // ============================================================
+        function renderAdminDashboard() {
+            // Stats
+            const total = registros.length;
+            const aprobados = registros.filter(r => r.aprobado).length;
+            const pendientes = total - aprobados;
+            const conTalleres = registros.filter(r => r.talleresElegidos && r.talleresElegidos.length > 0).length;
+
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-approved').innerText = aprobados;
+            document.getElementById('stat-pending').innerText = pendientes;
+            document.getElementById('stat-workshops').innerText = conTalleres;
+
+            // Tabla
             const tbody = document.getElementById('admin-table-body');
             tbody.innerHTML = '';
             if (registros.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; color:var(--text-muted);">No hay registros aún.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted);">No hay registros aún.</td></tr>';
                 return;
             }
-            registros.forEach((reg) => {
+            
+            // Ordenar: Pendientes primero, luego aprobados
+            const sortedRegistros = [...registros].sort((a, b) => a.aprobado - b.aprobado);
+
+            sortedRegistros.forEach((reg) => {
+                const talleresStr = reg.talleresElegidos && reg.talleresElegidos.length > 0 
+                    ? reg.talleresElegidos.map(id => LISTA_TALLERES[id]).join(', ') 
+                    : '<span style="color:var(--text-muted)">Ninguno</span>';
+                
+                const staffStr = reg.staff ? `<span class="badge-staff">${reg.staff}</span>` : '-';
+
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td style="font-weight:bold;">${reg.nombre}</td>
-                    <td>${reg.origen}</td>
-                    <td>${reg.etapa}</td>
-                    <td>${reg.hospedaje}</td>
-                    <td>${reg.tallerId ? 'Taller ' + reg.tallerId : '-'}</td>
-                    <td>${reg.staff ? reg.staff : '-'}</td>
                     <td style="font-family:monospace; color:var(--neon-cyan); font-weight:bold;">${reg.codigo}</td>
+                    <td>${reg.etapa}</td>
+                    <td style="font-size:0.75rem;">${talleresStr}</td>
+                    <td>${staffStr}</td>
                     <td><span class="status-badge ${reg.aprobado ? 'status-approved' : 'status-pending'}">${reg.aprobado ? 'Aprobado' : 'Pendiente'}</span></td>
                     <td>${!reg.aprobado ? `<button class="btn-sw" style="padding:4px 10px; font-size:0.7rem; border-radius:4px;" onclick="approveRegistration(${reg.id})">Aprobar</button>` : '<span style="color:var(--text-muted); font-size:0.8rem;">Validado</span>'}</td>
                 `;
@@ -693,19 +705,33 @@
             if (index !== -1) {
                 registros[index].aprobado = true;
                 saveRegistros();
-                renderAdminTable();
+                renderAdminDashboard();
             }
         }
 
         // ============================================================
-        // LÓGICA DEL DASHBOARD DE USUARIO
+        // RENDERIZADO DEL DASHBOARD DE USUARIO
         // ============================================================
         function renderUserDashboard() {
             if (!currentUser) return;
 
-            // Setear datos de la credencial
             document.getElementById('dash-user-name').innerText = currentUser.nombre;
             document.getElementById('dash-user-code').innerText = currentUser.codigo;
+
+            // Generar QR
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = ''; // Limpiar
+            const currentUrl = window.location.href.split('?')[0]; // Obtener URL base
+            const qrData = `${currentUrl}?auto_login=${currentUser.codigo}`;
+            
+            new QRCode(qrContainer, {
+                text: qrData,
+                width: 120,
+                height: 120,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
 
             // Renderizar Talleres
             renderWorkshops();
@@ -714,90 +740,78 @@
             const staffSection = document.getElementById('staff-section');
             if (currentUser.etapa === 'Pre-coordinadores' || currentUser.etapa === 'Coordinadores') {
                 staffSection.style.display = 'block';
-                if (currentUser.staff) {
-                    // Marcar el seleccionado previamente
-                    document.querySelectorAll('.staff-option').forEach(opt => {
-                        if (opt.innerText.trim().includes(currentUser.staff)) {
-                            opt.classList.add('selected');
-                        } else {
-                            opt.classList.remove('selected');
-                        }
-                    });
-                    document.getElementById('staff-save-btn').style.display = 'block';
-                }
+                document.querySelectorAll('.staff-option').forEach(opt => {
+                    if (opt.innerText.trim() === currentUser.staff) {
+                        opt.classList.add('selected');
+                    } else {
+                        opt.classList.remove('selected');
+                    }
+                });
+                if(currentUser.staff) document.getElementById('staff-save-btn').style.display = 'none';
             } else {
                 staffSection.style.display = 'none';
             }
 
-            // Iniciar Temporizador
             startCountdown();
         }
 
         function renderWorkshops() {
-            const talleresInfo = {
-                1: { max: 25 },
-                2: { max: 25 },
-                3: { max: 25 }
-            };
+            const grid = document.getElementById('workshop-grid');
+            grid.innerHTML = '';
 
-            for (let id = 1; id <= 3; id++) {
-                const capEl = document.getElementById('cap-' + id);
-                const barEl = document.getElementById('bar-' + id);
-                const cardEl = document.getElementById('ws-' + id);
-                const btnEl = cardEl.querySelector('button');
+            LISTA_TALLERES.forEach((nombre, index) => {
+                const id = index; // 0 a 8
                 
-                const cupoActual = talleresCupos[id];
-                const max = talleresInfo[id].max;
+                // Contar cuántos usuarios han elegido este taller
+                const count = registros.filter(r => r.talleresElegidos && r.talleresElegidos.includes(id)).length;
+                const isFull = count >= 25;
+                const isSelected = currentUser.talleresElegidos.includes(id);
 
-                capEl.innerText = `Cupo: ${cupoActual} / ${max}`;
-                barEl.style.width = `${(cupoActual / max) * 100}%`;
-
-                // Lógica visual
-                cardEl.classList.remove('selected', 'full');
-                btnEl.innerText = 'Seleccionar';
-                btnEl.disabled = false;
-
-                if (currentUser.tallerId === id) {
-                    cardEl.classList.add('selected');
-                    btnEl.innerText = 'Seleccionado';
-                    btnEl.disabled = true;
-                } else if (cupoActual >= max) {
-                    cardEl.classList.add('full');
-                    btnEl.innerText = 'Lleno';
-                    btnEl.disabled = true;
-                } else if (currentUser.tallerId !== null) {
-                    // Si ya tiene uno, no puede elegir otro (a menos que quieras permitir cambio, aquí lo bloqueamos)
-                    btnEl.innerText = 'Ya tienes uno';
-                    btnEl.disabled = true;
-                }
-            }
+                const card = document.createElement('div');
+                card.className = `workshop-card ${isSelected ? 'selected' : ''} ${isFull && !isSelected ? 'full' : ''}`;
+                
+                card.innerHTML = `
+                    <div class="workshop-title">${nombre}</div>
+                    <div class="workshop-capacity">Cupo: ${count} / 25</div>
+                    <div class="capacity-bar"><div class="capacity-fill" style="width: ${(count/25)*100}%"></div></div>
+                    <button class="btn-select-ws ${isSelected ? 'selected-btn' : ''}" 
+                        ${isSelected || isFull || (currentUser.talleresElegidos.length >= 2 && !isSelected) ? 'disabled' : ''}
+                        onclick="toggleWorkshop(${id})">
+                        ${isSelected ? 'Seleccionado' : (isFull ? 'Lleno' : (currentUser.talleresElegidos.length >= 2 ? 'Límite alcanzado' : 'Seleccionar'))}
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
         }
 
-        function selectWorkshop(id) {
+        function toggleWorkshop(id) {
             if (!currentUser) return;
-            if (currentUser.tallerId !== null) {
-                alert('Ya has seleccionado un taller. Contacta al Consejo si necesitas cambiarlo.');
-                return;
+
+            const index = currentUser.talleresElegidos.indexOf(id);
+
+            if (index !== -1) {
+                // Deseleccionar
+                currentUser.talleresElegidos.splice(index, 1);
+            } else {
+                // Seleccionar
+                if (currentUser.talleresElegidos.length >= 2) {
+                    alert('Solo puedes elegir 2 talleres. Desmarca uno para cambiar.');
+                    return;
+                }
+                // Verificar cupo
+                const count = registros.filter(r => r.talleresElegidos && r.talleresElegidos.includes(id)).length;
+                if (count >= 25) {
+                    alert('Este taller ya está lleno.');
+                    return;
+                }
+                currentUser.talleresElegidos.push(id);
             }
 
-            const max = 25;
-            if (talleresCupos[id] >= max) {
-                alert('Este taller ya está lleno.');
-                return;
-            }
-
-            // Actualizar cupos
-            talleresCupos[id]++;
-            currentUser.tallerId = id;
-
-            // Guardar
-            saveTalleres();
+            // Guardar en el arreglo principal
             const idx = registros.findIndex(r => r.id === currentUser.id);
             if (idx !== -1) { registros[idx] = currentUser; saveRegistros(); }
 
-            // Refrescar UI
             renderWorkshops();
-            alert('¡Taller seleccionado con éxito!');
         }
 
         function selectStaff(area, element) {
@@ -818,11 +832,11 @@
             if (idx !== -1) { registros[idx] = currentUser; saveRegistros(); }
             
             alert('Te has unido al staff en: ' + area);
-            btn.style.display = 'none'; // Ocultar tras guardar
+            btn.style.display = 'none';
         }
 
         // ============================================================
-        // TEMPORIZADOR
+        // TEMPORIZADOR (5 FEB 2027)
         // ============================================================
         let countdownInterval;
         function startCountdown() {
@@ -834,7 +848,7 @@
 
                 if (distance < 0) {
                     clearInterval(countdownInterval);
-                    document.getElementById('countdown-timer').innerHTML = '<div style="color:var(--gold); font-family:Montserrat; font-size:1.2rem;">¡EL EVENTO HA COMENZADO!</div>';
+                    document.getElementById('countdown-timer').innerHTML = '<div style="color:var(--gold); font-family:Montserrat; font-size:1.5rem; font-weight:900; text-shadow:0 0 20px var(--gold);">¡EL EVENTO HA COMENZADO!</div>';
                     return;
                 }
 
@@ -853,6 +867,8 @@
         function logout() {
             currentUser = null;
             if (countdownInterval) clearInterval(countdownInterval);
+            // Limpiar URL param
+            window.history.replaceState({}, document.title, window.location.pathname);
             executeJumpSequence(() => {
                 document.querySelectorAll('.app-section').forEach(s => s.style.display = 'none');
                 document.getElementById('hero-section').style.display = 'flex';

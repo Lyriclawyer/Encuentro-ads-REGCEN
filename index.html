@@ -8,6 +8,38 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,900;1,900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FIREBASE SDK CON TUS CREDENCIALES -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCA3yIROGBl280EV5wI8atmR75jK4WcQXM",
+            authDomain: "encuentro-ads-regcen.firebaseapp.com",
+            projectId: "encuentro-ads-regcen",
+            storageBucket: "encuentro-ads-regcen.firebasestorage.app",
+            messagingSenderId: "151622923000",
+            appId: "1:151622923000:web:a569848b4e166294a2810d",
+            measurementId: "G-JNY7LK9W9L"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        // Exponer globalmente para el HTML
+        window.db = db;
+        window.firebaseCollection = collection;
+        window.firebaseGetDocs = getDocs;
+        window.firebaseDoc = doc;
+        window.firebaseSetDoc = setDoc;
+        window.firebaseUpdateDoc = updateDoc;
+        
+        // Avisar que Firebase está listo
+        window.dispatchEvent(new Event('firebaseReady'));
+    </script>
+
     <style>
         :root {
             --neon-cyan: #00f3ff;
@@ -613,19 +645,16 @@
         </div>
     </section>
 
+    <!-- ========================================== -->
+    <!-- SCRIPT PRINCIPAL (CON LÓGICA DE FIREBASE)  -->
+    <!-- ========================================== -->
     <script>
         // ============================================================
-        // CONFIGURACIÓN DE FIREBASE (Para futuro)
+        // VARIABLES GLOBALES
         // ============================================================
-        function guardarEnBaseDeDatos() {
-            localStorage.setItem('regcen_registros', JSON.stringify(registros));
-        }
-
-        // ============================================================
-        // DATOS GLOBALES Y ESTADO
-        // ============================================================
-        let registros = JSON.parse(localStorage.getItem('regcen_registros')) || [];
+        let registros = []; // Ya no usamos localStorage
         let currentUser = null;
+        let dbReady = false;
 
         const EVENT_DATE = new Date('2027-02-05T16:00:00').getTime();
 
@@ -644,24 +673,45 @@
         ];
 
         // ============================================================
-        // INICIALIZACIÓN Y VALIDACIÓN QR
+        // INICIALIZACIÓN (ESPERANDO A FIREBASE)
         // ============================================================
-        window.addEventListener('load', () => {
+        window.addEventListener('firebaseReady', async () => {
+            dbReady = true;
+            console.log("Firebase conectado. Cargando datos...");
+            
+            // 1. Cargar todos los registros de la nube
+            await cargarRegistrosDesdeFirebase();
+            
+            // 2. Ejecutar la lógica de validación de QR si aplica
+            procesarURLValidacion();
+
+            // 3. Reproducir audio
             const audio = document.getElementById('bg-audio');
             if (audio) { audio.volume = 0.15; audio.loop = true; audio.play().catch(()=>{}); }
-            
-            // NUEVA LÓGICA DE LECTURA PARA GITHUB PAGES
+        });
+
+        async function cargarRegistrosDesdeFirebase() {
+            try {
+                const querySnapshot = await window.firebaseGetDocs(window.firebaseCollection(window.db, "registros"));
+                registros = [];
+                querySnapshot.forEach((doc) => {
+                    registros.push({ ...doc.data(), id: doc.id });
+                });
+                console.log("Registros cargados:", registros.length);
+            } catch (error) {
+                console.error("Error cargando registros:", error);
+                alert("Error de conexión con la base de datos. Revisa la consola.");
+            }
+        }
+
+        function procesarURLValidacion() {
             let validateCode = null;
             const urlParams = new URLSearchParams(window.location.search);
             
-            // 1. Revisar si viene con el parámetro tradicional
             if (urlParams.get('validar')) {
                 validateCode = urlParams.get('validar');
-            } 
-            // 2. Revisar si viene con la ruta /validar/CODIGO
-            else if (window.location.pathname.includes('/validar/')) {
+            } else if (window.location.pathname.includes('/validar/')) {
                 validateCode = window.location.pathname.split('/validar/')[1];
-                // Limpiar cualquier slash extra al final si existe
                 if(validateCode) validateCode = validateCode.replace('/', ''); 
             }
             
@@ -734,8 +784,11 @@
                     document.getElementById('val-staff-row').style.display = 'none';
                 }
             }
-        });
+        }
 
+        // ============================================================
+        // RESTO DE FUNCIONALIDAD (Lógica UI, etc)
+        // ============================================================
         document.addEventListener('click', () => {
             const audio = document.getElementById('bg-audio');
             if (audio && audio.paused) audio.play().catch(()=>{});
@@ -753,9 +806,7 @@
             }
         });
 
-        // ============================================================
         // FONDO DE ESTRELLAS
-        // ============================================================
         const canvas = document.getElementById('hyperspace');
         const ctx = canvas.getContext('2d');
         let width = canvas.width = window.innerWidth;
@@ -822,9 +873,7 @@
             }
         })();
 
-        // ============================================================
-        // LÓGICA DE NEGOCIO
-        // ============================================================
+        // NAVEGACIÓN
         function goToLogin() {
             executeJumpSequence(() => {
                 document.querySelectorAll('.app-section').forEach(s => s.style.display = 'none');
@@ -871,8 +920,11 @@
             return prefijo + '-' + sufijo;
         }
 
-        function submitRegistration(event) {
+        // REGISTRO
+        async function submitRegistration(event) {
             event.preventDefault();
+            if(!dbReady) { alert("Conectando con la base de datos, espera un momento..."); return; }
+
             const nombre = document.getElementById('reg-nombre').value.trim();
             const origen = document.getElementById('reg-origen').value;
             const edad = document.getElementById('reg-edad').value;
@@ -882,19 +934,30 @@
             const nuevoCodigo = generateCode(origen);
 
             const nuevoRegistro = {
-                id: Date.now(), nombre, origen, edad, telefono, etapa, hospedaje, codigo: nuevoCodigo, aprobado: false,
-                talleresElegidos: [], staff: null, equipoId: null
+                codigo: nuevoCodigo, nombre, origen, edad, telefono, etapa, hospedaje, 
+                aprobado: false, talleresElegidos: [], staff: null, equipoId: null,
+                timestamp: Date.now()
             };
 
-            registros.push(nuevoRegistro);
-            guardarEnBaseDeDatos(); 
+            try {
+                // Guardar en Firestore usando el código como ID del documento
+                await window.firebaseSetDoc(window.firebaseDoc(window.db, "registros", nuevoCodigo), nuevoRegistro);
+                
+                // Actualizar array local
+                registros.push(nuevoRegistro);
 
-            document.getElementById('generated-code').innerText = nuevoCodigo;
-            document.getElementById('register-form-container').style.display = 'none';
-            document.getElementById('jedi-success-message').style.display = 'block';
+                document.getElementById('generated-code').innerText = nuevoCodigo;
+                document.getElementById('register-form-container').style.display = 'none';
+                document.getElementById('jedi-success-message').style.display = 'block';
+            } catch (e) {
+                console.error("Error al registrar:", e);
+                alert("Hubo un error al guardar en la nube. Intenta de nuevo.");
+            }
         }
 
+        // LOGIN USUARIO
         function loginUser() {
+            if(!dbReady) { alert("Conectando con la base de datos, espera un momento..."); return; }
             const code = document.getElementById('login-code').value.trim().toUpperCase();
             if (!code) { alert('Por favor, ingresa tu código.'); return; }
 
@@ -914,10 +977,14 @@
             }
         }
 
-        function loginAdmin() {
+        // LOGIN ADMIN
+        async function loginAdmin() {
+            if(!dbReady) { alert("Conectando con la base de datos, espera un momento..."); return; }
             const pass = document.getElementById('admin-pass').value;
             if (pass === '123') {
                 document.getElementById('admin-pass').value = '';
+                // Refrescar datos frescos al entrar como admin
+                await cargarRegistrosDesdeFirebase(); 
                 executeJumpSequence(() => {
                     document.getElementById('login-section').style.display = 'none';
                     document.getElementById('admin-dashboard').style.display = 'block';
@@ -929,9 +996,7 @@
             }
         }
 
-        // ============================================================
-        // ASISTENTE IA CONSEJO (Lógica)
-        // ============================================================
+        // ASISTENTE IA CONSEJO
         function consultarIAAdmin(tipo) {
             const out = document.getElementById('ia-admin-output');
             out.style.display = 'block';
@@ -996,9 +1061,7 @@
             }, 600);
         }
 
-        // ============================================================
-        // ASISTENTE IA USUARIO (Chat Mejorado)
-        // ============================================================
+        // CHAT IA USUARIO
         function toggleChat() {
             const win = document.getElementById('chat-window');
             win.style.display = win.style.display === 'flex' ? 'none' : 'flex';
@@ -1015,7 +1078,6 @@
             if (!msg) return;
 
             const body = document.getElementById('chat-body');
-            
             const badWords = ['puta', 'mierda', 'pendejo', 'cabron', 'idiota', 'estupido', 'hack', 'admin', '123', 'contraseña'];
             const isBad = badWords.some(w => msg.toLowerCase().includes(w));
 
@@ -1058,9 +1120,7 @@
             }, 800);
         }
 
-        // ============================================================
         // RENDERIZADO ADMIN
-        // ============================================================
         function renderAdminDashboard() {
             const total = registros.length;
             const aprobados = registros.filter(r => r.aprobado).length;
@@ -1081,7 +1141,7 @@
             
             const sortedRegistros = [...registros].sort((a, b) => {
                 if (a.aprobado === b.aprobado) {
-                    return b.id - a.id; 
+                    return (b.timestamp || 0) - (a.timestamp || 0); 
                 }
                 return a.aprobado ? 1 : -1; 
             });
@@ -1104,7 +1164,7 @@
                     }
                 }
 
-                const fechaReg = new Date(reg.id).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+                const fechaReg = new Date(reg.timestamp || Date.now()).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -1122,7 +1182,7 @@
                     </td>
                     <td style="text-align:center;">
                         ${!reg.aprobado 
-                            ? `<button class="btn-sw" style="padding:6px 12px; font-size:0.75rem; border-radius:6px; white-space:nowrap;" onclick="approveRegistration(${reg.id})"><i class="fas fa-check"></i> Aprobar</button>` 
+                            ? `<button class="btn-sw" style="padding:6px 12px; font-size:0.75rem; border-radius:6px; white-space:nowrap;" onclick="approveRegistration('${reg.codigo}')"><i class="fas fa-check"></i> Aprobar</button>` 
                             : '<span style="color:#00ff64; font-size:1.2rem;"><i class="fas fa-check-circle"></i></span>'}
                     </td>
                 `;
@@ -1130,8 +1190,8 @@
             });
         }
 
-        function approveRegistration(id) {
-            const index = registros.findIndex(r => r.id === id);
+        async function approveRegistration(codigo) {
+            const index = registros.findIndex(r => r.codigo === codigo);
             if (index !== -1) {
                 let conteoEquipos = [0,0,0,0,0,0];
                 registros.forEach(r => {
@@ -1148,14 +1208,22 @@
 
                 registros[index].aprobado = true;
                 registros[index].equipoId = assignedTeam;
-                guardarEnBaseDeDatos();
-                renderAdminDashboard();
+
+                try {
+                    // Actualizar en Firebase
+                    await window.firebaseUpdateDoc(window.firebaseDoc(window.db, "registros", codigo), {
+                        aprobado: true,
+                        equipoId: assignedTeam
+                    });
+                    renderAdminDashboard();
+                } catch (e) {
+                    console.error("Error al aprobar:", e);
+                    alert("Error al actualizar en la base de datos.");
+                }
             }
         }
 
-        // ============================================================
-        // RENDERIZADO DASHBOARD USUARIO
-        // ============================================================
+        // RENDERIZADO USUARIO
         function renderUserDashboard() {
             if (!currentUser) return;
 
@@ -1180,11 +1248,9 @@
                 name.innerText = "SIN EQUIPO";
             }
 
-            // GENERAR QR CON LA API DE QUICKCHART apuntando a la ruta /validar/
             const qrContainer = document.getElementById('qrcode');
             qrContainer.innerHTML = ''; 
             
-            // Construimos la ruta limpia que activará el 404.html
             const baseUrl = "https://lyriclawyer.github.io/Encuentro-ads-REGCEN/validar/";
             const qrData = `${baseUrl}${currentUser.codigo}`;
             
@@ -1240,7 +1306,7 @@
             });
         }
 
-        function toggleWorkshop(id) {
+        async function toggleWorkshop(id) {
             if (!currentUser) return;
 
             const index = currentUser.talleresElegidos.indexOf(id);
@@ -1260,8 +1326,17 @@
                 currentUser.talleresElegidos.push(id);
             }
 
-            const idx = registros.findIndex(r => r.id === currentUser.id);
-            if (idx !== -1) { registros[idx] = currentUser; guardarEnBaseDeDatos(); }
+            const idx = registros.findIndex(r => r.codigo === currentUser.codigo);
+            if (idx !== -1) { 
+                registros[idx] = currentUser; 
+                try {
+                    await window.firebaseUpdateDoc(window.firebaseDoc(window.db, "registros", currentUser.codigo), {
+                        talleresElegidos: currentUser.talleresElegidos
+                    });
+                } catch(e) {
+                    console.error("Error guardando taller:", e);
+                }
+            }
 
             renderWorkshops();
         }
@@ -1273,23 +1348,30 @@
             document.getElementById('staff-save-btn').dataset.area = area;
         }
 
-        function saveStaffSelection() {
+        async function saveStaffSelection() {
             if (!currentUser) return;
             const btn = document.getElementById('staff-save-btn');
             const area = btn.dataset.area;
             if (!area) return;
 
             currentUser.staff = area;
-            const idx = registros.findIndex(r => r.id === currentUser.id);
-            if (idx !== -1) { registros[idx] = currentUser; guardarEnBaseDeDatos(); }
+            const idx = registros.findIndex(r => r.codigo === currentUser.codigo);
+            if (idx !== -1) { 
+                registros[idx] = currentUser; 
+                try {
+                    await window.firebaseUpdateDoc(window.firebaseDoc(window.db, "registros", currentUser.codigo), {
+                        staff: area
+                    });
+                } catch(e) {
+                    console.error("Error guardando staff:", e);
+                }
+            }
             
             alert('Te has unido al staff en: ' + area);
             btn.style.display = 'none';
         }
 
-        // ============================================================
         // TEMPORIZADOR
-        // ============================================================
         let countdownInterval;
         function startCountdown() {
             if (countdownInterval) clearInterval(countdownInterval);
@@ -1333,9 +1415,7 @@
             window.location.href = "https://lyriclawyer.github.io/Encuentro-ads-REGCEN/"; 
         }
 
-        // ============================================================
         // EFECTO HYPERESPACIO
-        // ============================================================
         const flashOverlay = document.getElementById('flash-overlay');
 
         function executeJumpSequence(cb) {

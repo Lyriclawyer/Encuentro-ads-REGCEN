@@ -19,6 +19,8 @@
             --gold: #fade4b;
             --accent-color: var(--neon-cyan);
             --faction-glow: rgba(0, 243, 255, 0.3);
+            --team-color: var(--neon-cyan); /* Variable dinámica para equipos */
+            --team-glow: var(--faction-glow);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
@@ -165,20 +167,58 @@
         .staff-option i { font-size: 1.5rem; color: var(--accent-color); margin-bottom: 10px; display: block; }
         .staff-option span { font-weight: 700; font-size: 0.9rem; text-transform: uppercase; }
 
-        /* --- VALIDACIÓN DE DATOS (QR) --- */
+        /* --- VALIDACIÓN DE DATOS (QR) REDISEÑADO --- */
         #validation-section { display: none; align-items: center; justify-content: center; height: 100vh; padding: 20px; }
-        .validation-card { background: rgba(0,0,0,0.9); border: 2px solid var(--neon-cyan); border-radius: 20px; padding: 40px; max-width: 500px; width: 100%; text-align: center; box-shadow: 0 0 60px rgba(0,243,255,0.4); position: relative; overflow: hidden; }
-        .validation-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at top right, rgba(0,243,255,0.1), transparent 60%); pointer-events: none; }
-        .validation-card .status-icon { font-size: 4rem; color: #00ff64; margin-bottom: 10px; animation: pulseIcon 2s infinite; }
+        
+        .validation-card { 
+            background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%); 
+            border-radius: 16px; padding: 0; max-width: 450px; width: 100%; 
+            text-align: center; position: relative; overflow: hidden; 
+            box-shadow: 0 0 40px var(--team-glow, rgba(0,243,255,0.2));
+            border: 2px solid var(--team-color, var(--neon-cyan));
+            display: flex; flex-direction: column;
+        }
+        
+        /* Efecto de luz superior */
+        .validation-card::before { 
+            content: ''; position: absolute; top: -100px; left: 50%; transform: translateX(-50%);
+            width: 200px; height: 200px; background: var(--team-color, var(--neon-cyan)); 
+            filter: blur(80px); opacity: 0.3; border-radius: 50%; pointer-events: none; z-index: 0;
+        }
+
+        .val-header { 
+            background: rgba(0,0,0,0.6); padding: 20px; 
+            border-bottom: 2px solid var(--team-color, var(--accent-color)); 
+            display: flex; align-items: center; justify-content: center; gap: 10px; position: relative; z-index: 1;
+        }
+        .val-header img { height: 30px; object-fit: contain; }
+        .val-header span { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1rem; color: #fff; letter-spacing: 1px; }
+
+        .val-body { padding: 30px 20px; position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; }
+        
+        .val-status-icon { font-size: 3.5rem; color: #00ff64; margin-bottom: 5px; animation: pulseIcon 2s infinite; }
         @keyframes pulseIcon { 0% { text-shadow: 0 0 10px #00ff64; } 50% { text-shadow: 0 0 30px #00ff64; } 100% { text-shadow: 0 0 10px #00ff64; } }
-        .validation-card h2 { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.5rem; color: var(--text-bright); margin-bottom: 20px; }
-        .validation-card .data-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left; }
-        .validation-card .data-row strong { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
-        .validation-card .data-row span { font-size: 1rem; color: var(--text-bright); font-weight: 600; text-align: right;}
-        .validation-card .data-row:last-child { border-bottom: none; }
+        
+        .val-status-title { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.4rem; color: #fff; margin-bottom: 20px; text-transform: uppercase; }
+
+        .val-team-badge { 
+            background: rgba(255,255,255,0.05); border: 1px solid var(--team-color, var(--neon-cyan)); 
+            padding: 8px 20px; border-radius: 50px; display: flex; align-items: center; gap: 10px; margin-bottom: 25px;
+            box-shadow: 0 0 15px var(--team-glow, var(--faction-glow));
+        }
+        .val-team-badge i { font-size: 1.5rem; color: var(--team-color, var(--neon-cyan)); }
+        .val-team-badge span { font-family: 'Montserrat', sans-serif; font-weight: 900; color: var(--team-color, var(--neon-cyan)); text-transform: uppercase; letter-spacing: 1px;}
+
+        .val-data-grid { width: 100%; display: flex; flex-direction: column; gap: 12px; text-align: left; margin-bottom: 30px; }
+        .val-data-row { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 8px;}
+        .val-data-row strong { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;}
+        .val-data-row span { font-size: 1rem; color: #fff; font-weight: 600; text-align: right; max-width: 60%; }
+        
+        .val-tags { display: flex; flex-wrap: wrap; gap: 5px; justify-content: flex-end; }
+        .val-tag { background: rgba(0,243,255,0.1); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; }
 
         /* Chat IA Flotante */
-        .chat-fab { position: fixed; bottom: 30px; right: 20px; background: var(--accent-color); color: #000; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; box-shadow: 0 4px 15px rgba(0,243,255,0.4); cursor: pointer; z-index: 1000; transition: transform 0.3s; }
+        .chat-fab { position: fixed; bottom: 30px; right: 20px; background: var(--accent-color); color: #000; width: 60px; height: 60px; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 1.8rem; box-shadow: 0 4px 15px rgba(0,243,255,0.4); cursor: pointer; z-index: 1000; transition: transform 0.3s; }
         .chat-fab:hover { transform: scale(1.1); }
         .chat-window { position: fixed; bottom: 100px; right: 20px; width: 350px; max-width: calc(100vw - 40px); height: 500px; max-height: calc(100vh - 120px); background: var(--sw-gray); border: 2px solid var(--accent-color); border-radius: 16px; display: none; flex-direction: column; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.8); overflow: hidden; }
         .chat-header { background: rgba(0,243,255,0.1); padding: 15px; border-bottom: 1px solid var(--sw-border); display: flex; justify-content: space-between; align-items: center; }
@@ -226,7 +266,7 @@
             .countdown-timer { gap: 8px; }
             .time-box { padding: 8px 10px; min-width: 55px; }
             .time-box .num { font-size: 1.3rem; }
-            .validation-card { padding: 20px; }
+            .validation-card { padding: 0; }
             .chat-window { bottom: 0; right: 0; width: 100vw; height: 100vh; max-height: 100vh; border-radius: 0; border: none; }
         }
     </style>
@@ -246,7 +286,7 @@
     </audio>
 
     <!-- CHAT IA FLOTANTE (Para usuarios) -->
-    <div class="chat-fab" id="chat-fab" onclick="toggleChat()" style="display:none;">
+    <div class="chat-fab" id="chat-fab" onclick="toggleChat()">
         <i class="fas fa-robot"></i>
     </div>
     <div class="chat-window" id="chat-window">
@@ -255,7 +295,7 @@
             <i class="fas fa-times close-chat" onclick="toggleChat()"></i>
         </div>
         <div class="chat-body" id="chat-body">
-            <div class="chat-msg bot">¡Hola, joven padawan! Soy tu Asistente Jedi. ¿En qué puedo ayudarte hoy? Puedes preguntarme sobre el hospedaje, talleres, la ubicación o el código QR.</div>
+            <div class="chat-msg bot">¡Que la Fuerza te acompañe, joven padawan! Soy tu guía en esta aventura. ¿Tienes dudas sobre el evento, los talleres o tu equipo? Pregúntame lo que necesites, pero recuerda mantener el respeto y la caridad en tus palabras.</div>
         </div>
         <div class="chat-input-area">
             <input type="text" id="chat-input" placeholder="Escribe tu duda aquí..." onkeypress="handleChatEnter(event)">
@@ -522,43 +562,63 @@
         </div>
     </section>
 
-    <!-- SECCIÓN 6: VALIDACIÓN DE DATOS (QR) -->
+    <!-- SECCIÓN 6: VALIDACIÓN DE DATOS (QR) REDISEÑADO -->
     <section id="validation-section" class="app-section" style="padding: 0; display: none;">
-        <div class="validation-card">
-            <i class="fas fa-check-circle status-icon"></i>
-            <h2>¡Acceso Válido!</h2>
-            <p style="color:var(--gold); font-weight:700; margin-bottom:20px; text-transform:uppercase; letter-spacing:1px;">Datos del Participante</p>
+        <div class="validation-card" id="validation-card">
+            <div class="val-header">
+                <img src="REGCEN.jpeg" alt="Logo" onerror="this.style.display='none'">
+                <span>REGCEN</span>
+            </div>
             
-            <div class="data-row">
-                <strong>Nombre:</strong>
-                <span id="val-nombre">Cargando...</span>
-            </div>
-            <div class="data-row">
-                <strong>Procedencia:</strong>
-                <span id="val-origen">Cargando...</span>
-            </div>
-            <div class="data-row">
-                <strong>Etapa:</strong>
-                <span id="val-etapa">Cargando...</span>
-            </div>
-            <div class="data-row" style="background:rgba(255,255,255,0.05); border-radius:6px; padding:10px; margin:10px 0; border:none;">
-                <strong>EQUIPO ASIGNADO:</strong>
-                <span id="val-equipo" style="color:var(--gold); font-weight:900; text-transform:uppercase;">Cargando...</span>
-            </div>
-            <div class="data-row">
-                <strong>Talleres:</strong>
-                <span id="val-talleres" style="text-align:right; font-size:0.85rem;">Cargando...</span>
-            </div>
-            <div class="data-row" id="val-staff-row" style="display:none;">
-                <strong>Staff:</strong>
-                <span id="val-staff" style="color:var(--gold); font-weight:bold;">Ninguno</span>
-            </div>
+            <div class="val-body">
+                <i class="fas fa-check-circle val-status-icon"></i>
+                <h2 class="val-status-title">¡Acceso Válido!</h2>
+                
+                <div class="val-team-badge" id="val-team-badge">
+                    <i class="fas fa-shield-alt" id="val-team-icon"></i>
+                    <span id="val-team-name">EQUIPO</span>
+                </div>
 
-            <button class="btn-sw" style="margin-top:30px; width:100%; border-radius:8px;" onclick="closeValidation()">Cerrar Ventana</button>
+                <div class="val-data-grid">
+                    <div class="val-data-row">
+                        <strong>Nombre:</strong>
+                        <span id="val-nombre">Cargando...</span>
+                    </div>
+                    <div class="val-data-row">
+                        <strong>Procedencia:</strong>
+                        <span id="val-origen">Cargando...</span>
+                    </div>
+                    <div class="val-data-row">
+                        <strong>Etapa:</strong>
+                        <span id="val-etapa">Cargando...</span>
+                    </div>
+                    <div class="val-data-row" id="val-staff-row" style="display:none;">
+                        <strong>Staff:</strong>
+                        <span id="val-staff" style="color:var(--gold); font-weight:bold;">Ninguno</span>
+                    </div>
+                    <div class="val-data-row" style="border-bottom:none;">
+                        <strong>Talleres:</strong>
+                        <div class="val-tags" id="val-talleres">
+                            <!-- Se llena con JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-sw" style="width:100%; border-radius:8px;" onclick="closeValidation()">Cerrar Ventana</button>
+            </div>
         </div>
     </section>
 
     <script>
+        // ============================================================
+        // CONFIGURACIÓN DE FIREBASE (Para futuro)
+        // ============================================================
+        // Cuando estés listo para Firebase, solo tendrás que reemplazar 
+        // la función saveRegistros() con tu lógica de Firestore.
+        function guardarEnBaseDeDatos() {
+            localStorage.setItem('regcen_registros', JSON.stringify(registros));
+        }
+
         // ============================================================
         // DATOS GLOBALES Y ESTADO
         // ============================================================
@@ -599,23 +659,34 @@
                 document.getElementById('validation-section').style.display = 'flex';
                 
                 const reg = registros.find(r => r.codigo.toUpperCase() === validateCode.toUpperCase());
+                const valCard = document.getElementById('validation-card');
                 
                 if (reg && reg.aprobado) {
+                    // Aplicar estilos del equipo
+                    const eq = EQUIPOS_SW.find(e => e.id === reg.equipoId);
+                    if (eq) {
+                        valCard.style.setProperty('--team-color', eq.color);
+                        valCard.style.setProperty('--team-glow', eq.glow);
+                        document.getElementById('val-team-icon').className = `fas ${eq.icono}`;
+                        document.getElementById('val-team-name').innerText = eq.nombre;
+                    } else {
+                        valCard.style.setProperty('--team-color', 'var(--neon-cyan)');
+                        valCard.style.setProperty('--team-glow', 'var(--faction-glow)');
+                        document.getElementById('val-team-icon').className = `fas fa-shield-alt`;
+                        document.getElementById('val-team-name').innerText = "Sin Equipo";
+                    }
+
                     document.getElementById('val-nombre').innerText = reg.nombre;
                     document.getElementById('val-origen').innerText = reg.origen;
                     document.getElementById('val-etapa').innerText = reg.etapa;
-                    
-                    const eq = EQUIPOS_SW.find(e => e.id === reg.equipoId);
-                    if(eq) {
-                        document.getElementById('val-equipo').innerText = eq.nombre;
-                        document.getElementById('val-equipo').style.color = eq.color;
-                    }
 
-                    let talleresTexto = "Ninguno seleccionado";
+                    let talleresHtml = '<span style="color:var(--text-muted); font-size:0.85rem;">Ninguno</span>';
                     if (reg.talleresElegidos && reg.talleresElegidos.length > 0) {
-                        talleresTexto = reg.talleresElegidos.map(id => LISTA_TALLERES[id]).join('<br>');
+                        talleresHtml = reg.talleresElegidos.map(id => 
+                            `<span class="val-tag">${LISTA_TALLERES[id]}</span>`
+                        ).join('');
                     }
-                    document.getElementById('val-talleres').innerHTML = talleresTexto;
+                    document.getElementById('val-talleres').innerHTML = talleresHtml;
 
                     if (reg.staff) {
                         document.getElementById('val-staff-row').style.display = 'flex';
@@ -624,25 +695,31 @@
                         document.getElementById('val-staff-row').style.display = 'none';
                     }
                 } else if (reg && !reg.aprobado) {
-                    document.querySelector('.validation-card .status-icon').style.color = "#ffc800";
-                    document.querySelector('.validation-card .status-icon').className = "fas fa-exclamation-triangle status-icon";
-                    document.querySelector('.validation-card h2').innerText = "REGISTRO PENDIENTE";
+                    valCard.style.setProperty('--team-color', '#ffc800');
+                    valCard.style.setProperty('--team-glow', 'rgba(255, 200, 0, 0.4)');
+                    document.querySelector('.val-status-icon').style.color = "#ffc800";
+                    document.querySelector('.val-status-icon').className = "fas fa-exclamation-triangle val-status-icon";
+                    document.querySelector('.val-status-title').innerText = "REGISTRO PENDIENTE";
+                    document.getElementById('val-team-badge').style.display = 'none';
+                    
                     document.getElementById('val-nombre').innerText = reg.nombre;
                     document.getElementById('val-origen').innerText = reg.origen;
                     document.getElementById('val-etapa').innerText = reg.etapa;
-                    document.getElementById('val-equipo').innerText = "No asignado";
-                    document.getElementById('val-talleres').innerText = "No aprobado aún";
+                    document.getElementById('val-talleres').innerHTML = '<span style="color:var(--text-muted); font-size:0.85rem;">No aprobado aún</span>';
                     document.getElementById('val-staff-row').style.display = 'none';
                 } else {
-                    document.querySelector('.validation-card .status-icon').style.color = "#ff3333";
-                    document.querySelector('.validation-card .status-icon').className = "fas fa-times-circle status-icon";
-                    document.querySelector('.validation-card h2').innerText = "ACCESO DENEGADO";
+                    valCard.style.setProperty('--team-color', '#ff3333');
+                    valCard.style.setProperty('--team-glow', 'rgba(255, 51, 51, 0.4)');
+                    document.querySelector('.val-status-icon').style.color = "#ff3333";
+                    document.querySelector('.val-status-icon').className = "fas fa-times-circle val-status-icon";
+                    document.querySelector('.val-status-title').innerText = "ACCESO DENEGADO";
+                    document.getElementById('val-team-badge').style.display = 'none';
+                    
                     document.getElementById('val-nombre').innerText = "CÓDIGO NO VÁLIDO";
                     document.getElementById('val-nombre').style.color = "#ff3333";
                     document.getElementById('val-origen').innerText = "-";
                     document.getElementById('val-etapa').innerText = "-";
-                    document.getElementById('val-equipo').innerText = "-";
-                    document.getElementById('val-talleres').innerText = "-";
+                    document.getElementById('val-talleres').innerHTML = '-';
                     document.getElementById('val-staff-row').style.display = 'none';
                 }
             }
@@ -737,8 +814,6 @@
         // ============================================================
         // LÓGICA DE NEGOCIO
         // ============================================================
-        function saveRegistros() { localStorage.setItem('regcen_registros', JSON.stringify(registros)); }
-
         function goToLogin() {
             executeJumpSequence(() => {
                 document.querySelectorAll('.app-section').forEach(s => s.style.display = 'none');
@@ -801,7 +876,7 @@
             };
 
             registros.push(nuevoRegistro);
-            saveRegistros();
+            guardarEnBaseDeDatos(); // Llamada unificada para Firebase
 
             document.getElementById('generated-code').innerText = nuevoCodigo;
             document.getElementById('register-form-container').style.display = 'none';
@@ -911,7 +986,7 @@
         }
 
         // ============================================================
-        // ASISTENTE IA USUARIO (Chat)
+        // ASISTENTE IA USUARIO (Chat Mejorado)
         // ============================================================
         function toggleChat() {
             const win = document.getElementById('chat-window');
@@ -925,11 +1000,15 @@
 
         function sendUserMessage() {
             const input = document.getElementById('chat-input');
-            const msg = input.value.trim();
+            let msg = input.value.trim();
             if (!msg) return;
 
             const body = document.getElementById('chat-body');
             
+            // Filtro de seguridad simple
+            const badWords = ['puta', 'mierda', 'pendejo', 'cabron', 'idiota', 'estupido', 'hack', 'admin', '123', 'contraseña'];
+            const isBad = badWords.some(w => msg.toLowerCase().includes(w));
+
             // Agregar mensaje del usuario
             const userDiv = document.createElement('div');
             userDiv.className = 'chat-msg user';
@@ -938,27 +1017,31 @@
             input.value = '';
             body.scrollTop = body.scrollHeight;
 
-            // Simular respuesta del bot (Lógica de palabras clave)
+            // Simular respuesta del bot
             setTimeout(() => {
                 const botDiv = document.createElement('div');
                 botDiv.className = 'chat-msg bot';
                 let lower = msg.toLowerCase();
                 let response = "";
 
-                if (lower.includes('hospedaje') || lower.includes('dormir') || lower.includes('hotel')) {
-                    response = "El hospedaje está incluido para quienes lo solicitaron en el registro. Se te asignará un lugar con otros miembros de tu equipo. Debes traer tu sleeping bag o cobijas y artículos de aseo personal.";
+                if (isBad) {
+                    response = "Joven padawan, recuerda que un Jedi busca la paz y el respeto. No tolero ese tipo de lenguaje. Por favor, mantengamos una conversación edificante y caritativa.";
+                } else if (lower.includes('hospedaje') || lower.includes('dormir') || lower.includes('hotel')) {
+                    response = "El hospedaje está incluido para quienes lo solicitaron. Se te asignará un lugar con otros miembros de tu equipo. Recuerda traer tu sleeping bag y artículos de aseo personal. ¡La convivencia es parte de la aventura!";
                 } else if (lower.includes('taller') || lower.includes('escoger')) {
-                    response = "Puedes elegir 2 talleres en tu panel principal. ¡Date prisa! El cupo es de máximo 25 personas por taller y se van llenando rápido.";
+                    response = "Puedes elegir 2 talleres en tu panel principal. ¡Date prisa! El cupo es de máximo 25 personas por taller. Elige aquellos que despierten tu creatividad y te ayuden a crecer.";
                 } else if (lower.includes('qr') || lower.includes('codigo') || lower.includes('gafete')) {
-                    response = "Tu gafete digital con el código QR ya está en tu panel. Escanéalo en la entrada. Recuerda que es personal e intransferible.";
+                    response = "Tu gafete digital con el código QR ya está en tu panel. Escanéalo en la entrada. Recuerda que es personal e intransferible. ¡No lo compartas!";
                 } else if (lower.includes('donde') || lower.includes('lugar') || lower.includes('ubicacion') || lower.includes('direccion')) {
                     response = "El evento es en Calle Francisco Sarabia No. 511, Col. Fracc Niños Héroes, Irapuato, Guanajuato. C.P. 36660. Se realizará el 5 de Febrero de 2027 a las 16:00 hrs.";
                 } else if (lower.includes('equipo')) {
-                    response = "Tu equipo fue asignado por el Consejo para mantener el equilibrio. ¡Busca a tus compañeros en el evento para las dinámicas!";
+                    response = "Tu equipo fue asignado por el Consejo para mantener el equilibrio. ¡Busca a tus compañeros en el evento para las dinámicas! Recuerda que trabajando juntos, como en la Orden Jedi, pueden lograr grandes cosas.";
+                } else if (lower.includes('reglas') || lower.includes('llevar') || lower.includes('ropa')) {
+                    response = "Te sugiero traer ropa cómoda, una botella de agua, tu Biblia o libreta de apuntes, y mucha actitud positiva. Las reglas principales se basan en el respeto, la puntualidad y la caridad con los demás.";
                 } else if (lower.includes('hola') || lower.includes('buenos dias') || lower.includes('que tal')) {
                     response = "¡Hola! Que la Fuerza te acompañe. ¿Tienes dudas sobre tu registro, talleres o el evento?";
                 } else {
-                    response = "Interesante pregunta, joven padawan. No tengo esa información exacta en mi base de datos, pero puedes preguntar a los coordinadores en el evento. ¿Hay algo más sobre lo que te pueda ayudar (talleres, QR, hospedaje, ubicación)?";
+                    response = "Interesante pregunta, joven padawan. No tengo esa información exacta en mi base de datos, pero puedes preguntar a los coordinadores en el evento. ¿Hay algo más sobre lo que te pueda ayudar (talleres, QR, hospedaje, ubicación, reglas)?";
                 }
 
                 botDiv.innerText = response;
@@ -1058,7 +1141,7 @@
 
                 registros[index].aprobado = true;
                 registros[index].equipoId = assignedTeam;
-                saveRegistros();
+                guardarEnBaseDeDatos();
                 renderAdminDashboard();
             }
         }
@@ -1091,17 +1174,14 @@
                 name.innerText = "SIN EQUIPO";
             }
 
-            // GENERAR QR CON LA API DE QUICKCHART (100% confiable)
+            // GENERAR QR CON LA API DE QUICKCHART
             const qrContainer = document.getElementById('qrcode');
             qrContainer.innerHTML = ''; 
             
-            // Construir URL absoluta limpia
-            const baseUrl = window.location.origin + window.location.pathname;
+            const baseUrl = "https://lyriclawyer.github.io/Encuentro-ads-REGCEN/"; // URL fija de GitHub Pages
             const qrData = `${baseUrl}?validar=${currentUser.codigo}`;
             
-            // Usamos QuickChart para generar la imagen y la insertamos en el HTML
             const qrImg = document.createElement('img');
-            // Codificamos la URL para que no haya problemas de caracteres
             qrImg.src = `https://quickchart.io/qr?text=${encodeURIComponent(qrData)}&size=140&margin=1&ecLevel=H`;
             qrImg.alt = 'Código QR de Acceso';
             qrContainer.appendChild(qrImg);
@@ -1174,7 +1254,7 @@
             }
 
             const idx = registros.findIndex(r => r.id === currentUser.id);
-            if (idx !== -1) { registros[idx] = currentUser; saveRegistros(); }
+            if (idx !== -1) { registros[idx] = currentUser; guardarEnBaseDeDatos(); }
 
             renderWorkshops();
         }
@@ -1194,7 +1274,7 @@
 
             currentUser.staff = area;
             const idx = registros.findIndex(r => r.id === currentUser.id);
-            if (idx !== -1) { registros[idx] = currentUser; saveRegistros(); }
+            if (idx !== -1) { registros[idx] = currentUser; guardarEnBaseDeDatos(); }
             
             alert('Te has unido al staff en: ' + area);
             btn.style.display = 'none';

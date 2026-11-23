@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Redirigiendo...</title>
+</head>
+<body>
+    <script>
+        // Toma la ruta actual (ej. /validar/IRT-A1B2) y la convierte en un parámetro
+        // para que tu index.html lo pueda leer.
+        var path = window.location.pathname;
+        // Redirige al index.html con el código como parámetro
+        window.location.replace('/Encuentro-ads-REGCEN/?validar=' + encodeURIComponent(path.replace('/validar/', '')));
+    </script>
+</body>
+</html>

@@ -19,7 +19,7 @@
             --gold: #fade4b;
             --accent-color: var(--neon-cyan);
             --faction-glow: rgba(0, 243, 255, 0.3);
-            --team-color: var(--neon-cyan); /* Variable dinámica para equipos */
+            --team-color: var(--neon-cyan);
             --team-glow: var(--faction-glow);
         }
 
@@ -75,6 +75,11 @@
         .form-select option { background: #151515; color: #fff; }
 
         /* Dashboard Admin Estilo Excel */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: var(--sw-gray); border: 1px solid var(--sw-border); border-radius: 12px; padding: 15px; text-align: center; }
+        .stat-card h4 { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .stat-card .value { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.8rem; color: var(--accent-color); }
+        
         .admin-table-container { width: 100%; overflow-x: auto; background: var(--sw-gray); border-radius: 12px; border: 1px solid var(--sw-border); box-shadow: 0 4px 15px rgba(0,0,0,0.5); margin-top: 20px;}
         .admin-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 1200px; }
         .admin-table th, .admin-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--sw-border); border-right: 1px solid rgba(255,255,255,0.05); vertical-align: top; }
@@ -179,7 +184,6 @@
             display: flex; flex-direction: column;
         }
         
-        /* Efecto de luz superior */
         .validation-card::before { 
             content: ''; position: absolute; top: -100px; left: 50%; transform: translateX(-50%);
             width: 200px; height: 200px; background: var(--team-color, var(--neon-cyan)); 
@@ -613,8 +617,6 @@
         // ============================================================
         // CONFIGURACIÓN DE FIREBASE (Para futuro)
         // ============================================================
-        // Cuando estés listo para Firebase, solo tendrás que reemplazar 
-        // la función saveRegistros() con tu lógica de Firestore.
         function guardarEnBaseDeDatos() {
             localStorage.setItem('regcen_registros', JSON.stringify(registros));
         }
@@ -625,7 +627,6 @@
         let registros = JSON.parse(localStorage.getItem('regcen_registros')) || [];
         let currentUser = null;
 
-        // Fecha del evento: 5 de Febrero de 2027 a las 16:00 hrs
         const EVENT_DATE = new Date('2027-02-05T16:00:00').getTime();
 
         const LISTA_TALLERES = [
@@ -633,7 +634,6 @@
             "Bisutería", "Cerámica", "Hojas recicladas", "Música"
         ];
 
-        // Configuración de los 6 Equipos Star Wars
         const EQUIPOS_SW = [
             { id: 0, nombre: "Rebelión", icono: "fa-rebel", color: "#ff6b6b", glow: "rgba(255, 107, 107, 0.4)" },
             { id: 1, nombre: "Imperio", icono: "fa-galactic-empire", color: "#6ba3ff", glow: "rgba(107, 163, 255, 0.4)" },
@@ -650,8 +650,20 @@
             const audio = document.getElementById('bg-audio');
             if (audio) { audio.volume = 0.15; audio.loop = true; audio.play().catch(()=>{}); }
             
+            // NUEVA LÓGICA DE LECTURA PARA GITHUB PAGES
+            let validateCode = null;
             const urlParams = new URLSearchParams(window.location.search);
-            const validateCode = urlParams.get('validar');
+            
+            // 1. Revisar si viene con el parámetro tradicional
+            if (urlParams.get('validar')) {
+                validateCode = urlParams.get('validar');
+            } 
+            // 2. Revisar si viene con la ruta /validar/CODIGO
+            else if (window.location.pathname.includes('/validar/')) {
+                validateCode = window.location.pathname.split('/validar/')[1];
+                // Limpiar cualquier slash extra al final si existe
+                if(validateCode) validateCode = validateCode.replace('/', ''); 
+            }
             
             if (validateCode) {
                 document.getElementById('hero-section').style.display = 'none';
@@ -662,7 +674,6 @@
                 const valCard = document.getElementById('validation-card');
                 
                 if (reg && reg.aprobado) {
-                    // Aplicar estilos del equipo
                     const eq = EQUIPOS_SW.find(e => e.id === reg.equipoId);
                     if (eq) {
                         valCard.style.setProperty('--team-color', eq.color);
@@ -876,7 +887,7 @@
             };
 
             registros.push(nuevoRegistro);
-            guardarEnBaseDeDatos(); // Llamada unificada para Firebase
+            guardarEnBaseDeDatos(); 
 
             document.getElementById('generated-code').innerText = nuevoCodigo;
             document.getElementById('register-form-container').style.display = 'none';
@@ -895,7 +906,7 @@
                 executeJumpSequence(() => {
                     document.getElementById('login-section').style.display = 'none';
                     document.getElementById('user-approved-section').style.display = 'block';
-                    document.getElementById('chat-fab').style.display = 'flex'; // Mostrar botón de IA
+                    document.getElementById('chat-fab').style.display = 'flex';
                     renderUserDashboard();
                 });
             } else {
@@ -1005,11 +1016,9 @@
 
             const body = document.getElementById('chat-body');
             
-            // Filtro de seguridad simple
             const badWords = ['puta', 'mierda', 'pendejo', 'cabron', 'idiota', 'estupido', 'hack', 'admin', '123', 'contraseña'];
             const isBad = badWords.some(w => msg.toLowerCase().includes(w));
 
-            // Agregar mensaje del usuario
             const userDiv = document.createElement('div');
             userDiv.className = 'chat-msg user';
             userDiv.innerText = msg;
@@ -1017,7 +1026,6 @@
             input.value = '';
             body.scrollTop = body.scrollHeight;
 
-            // Simular respuesta del bot
             setTimeout(() => {
                 const botDiv = document.createElement('div');
                 botDiv.className = 'chat-msg bot';
@@ -1125,7 +1133,6 @@
         function approveRegistration(id) {
             const index = registros.findIndex(r => r.id === id);
             if (index !== -1) {
-                // Lógica de Equilibrio
                 let conteoEquipos = [0,0,0,0,0,0];
                 registros.forEach(r => {
                     if(r.aprobado && r.equipoId !== null) conteoEquipos[r.equipoId]++;
@@ -1156,7 +1163,6 @@
             document.getElementById('dash-user-origin').innerText = currentUser.origen;
             document.getElementById('dash-user-code').innerText = currentUser.codigo;
 
-            // Cargar estilos del equipo
             const eq = EQUIPOS_SW.find(e => e.id === currentUser.equipoId);
             const card = document.getElementById('user-credential');
             const icon = document.getElementById('cred-team-icon');
@@ -1174,12 +1180,13 @@
                 name.innerText = "SIN EQUIPO";
             }
 
-            // GENERAR QR CON LA API DE QUICKCHART
+            // GENERAR QR CON LA API DE QUICKCHART apuntando a la ruta /validar/
             const qrContainer = document.getElementById('qrcode');
             qrContainer.innerHTML = ''; 
             
-            const baseUrl = "https://lyriclawyer.github.io/Encuentro-ads-REGCEN/"; // URL fija de GitHub Pages
-            const qrData = `${baseUrl}?validar=${currentUser.codigo}`;
+            // Construimos la ruta limpia que activará el 404.html
+            const baseUrl = "https://lyriclawyer.github.io/Encuentro-ads-REGCEN/validar/";
+            const qrData = `${baseUrl}${currentUser.codigo}`;
             
             const qrImg = document.createElement('img');
             qrImg.src = `https://quickchart.io/qr?text=${encodeURIComponent(qrData)}&size=140&margin=1&ecLevel=H`;
@@ -1316,14 +1323,14 @@
             executeJumpSequence(() => {
                 document.querySelectorAll('.app-section').forEach(s => s.style.display = 'none');
                 document.getElementById('hero-section').style.display = 'flex';
-                document.getElementById('chat-fab').style.display = 'none'; // Ocultar chat
+                document.getElementById('chat-fab').style.display = 'none';
                 document.getElementById('chat-window').style.display = 'none';
                 backToLoginOptions();
             });
         }
 
         function closeValidation() {
-            window.location.href = window.location.pathname; 
+            window.location.href = "https://lyriclawyer.github.io/Encuentro-ads-REGCEN/"; 
         }
 
         // ============================================================

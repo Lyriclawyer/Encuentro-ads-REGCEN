@@ -75,7 +75,7 @@
 
         /* Dashboard Admin Estilo Excel */
         .admin-table-container { width: 100%; overflow-x: auto; background: var(--sw-gray); border-radius: 12px; border: 1px solid var(--sw-border); box-shadow: 0 4px 15px rgba(0,0,0,0.5); margin-top: 20px;}
-        .admin-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 1100px; }
+        .admin-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 1200px; }
         .admin-table th, .admin-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--sw-border); border-right: 1px solid rgba(255,255,255,0.05); vertical-align: top; }
         .admin-table th { background: #1a1a1a; color: var(--accent-color); text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1px; position: sticky; top: 0; z-index: 2; border-bottom: 2px solid var(--accent-color);}
         .admin-table tr:hover { background: rgba(0, 243, 255, 0.05); }
@@ -99,14 +99,31 @@
         .user-dashboard-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; max-width: 900px; margin: 0 auto 30px auto; }
         @media (max-width: 768px) { .user-dashboard-grid { grid-template-columns: 1fr; } }
 
-        .credential-card { background: linear-gradient(135deg, #1a1a2e, #0f0f1a); border: 2px solid var(--accent-color); border-radius: 16px; padding: 20px; text-align: center; position: relative; overflow: hidden; box-shadow: 0 0 30px var(--faction-glow); }
-        .credential-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(0, 243, 255, 0.1), transparent); transform: rotate(45deg); animation: shine 3s infinite; }
+        /* Gafete / Credencial */
+        .credential-card { 
+            background: linear-gradient(135deg, #1a1a2e, #0f0f1a); 
+            border-radius: 16px; padding: 0; text-align: center; position: relative; overflow: hidden; 
+            box-shadow: 0 0 30px var(--team-glow, var(--faction-glow));
+            border: 2px solid var(--team-color, var(--accent-color));
+            display: flex; flex-direction: column;
+        }
+        .credential-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.05), transparent); transform: rotate(45deg); animation: shine 4s infinite; pointer-events: none; }
         @keyframes shine { 0% { transform: translateX(-100%) rotate(45deg); } 100% { transform: translateX(100%) rotate(45deg); } }
         
-        .credential-card h3 { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1rem; color: var(--gold); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; }
-        .qr-container { background: #fff; padding: 10px; border-radius: 8px; display: inline-block; margin: 15px auto; }
-        .credential-card .user-name { font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
-        .credential-card .user-code { font-family: monospace; color: var(--neon-cyan); font-weight: bold; font-size: 1.1rem; letter-spacing: 1px; background: rgba(0,243,255,0.1); padding: 4px 10px; border-radius: 6px; display: inline-block; }
+        .cred-header { background: rgba(0,0,0,0.5); padding: 15px; border-bottom: 2px solid var(--team-color, var(--accent-color)); display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .cred-header img { height: 35px; object-fit: contain; }
+        .cred-header span { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.1rem; color: #fff; letter-spacing: 1px; }
+        
+        .cred-body { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; align-items: center; }
+        
+        .team-symbol { font-size: 3rem; color: var(--team-color, var(--accent-color)); margin-bottom: 10px; text-shadow: 0 0 15px var(--team-glow, var(--faction-glow)); }
+        .team-name { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.2rem; color: var(--team-color, var(--accent-color)); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; }
+        
+        .qr-container { background: #fff; padding: 8px; border-radius: 8px; display: inline-block; margin-bottom: 15px; }
+        
+        .cred-user-name { font-size: 1.3rem; font-weight: 700; margin-bottom: 5px; line-height: 1.1; }
+        .cred-user-origin { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .cred-user-code { font-family: monospace; color: #000; background: var(--team-color, var(--accent-color)); font-weight: bold; font-size: 1rem; letter-spacing: 1px; padding: 4px 12px; border-radius: 6px; display: inline-block; }
 
         .event-info-card { background: var(--sw-gray); border: 1px solid var(--sw-border); border-radius: 16px; padding: 25px; }
         .event-info-card h3 { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.2rem; color: var(--accent-color); text-transform: uppercase; margin-bottom: 15px; border-bottom: 1px solid var(--sw-border); padding-bottom: 10px; }
@@ -347,6 +364,7 @@
                             <th>Etapa / Hosp.</th>
                             <th>Talleres (Elegidos)</th>
                             <th>Staff</th>
+                            <th>Equipo</th>
                             <th>Estado</th>
                             <th>Acción</th>
                         </tr>
@@ -376,14 +394,23 @@
         </div>
 
         <div class="user-dashboard-grid">
-            <!-- Credencial con QR -->
-            <div class="credential-card">
-                <h3>Pase de Acceso Oficial</h3>
-                <div id="qrcode" class="qr-container"></div>
-                <div class="user-name" id="dash-user-name">Nombre del Usuario</div>
-                <div class="user-code" id="dash-user-code">CODIGO-XXXX</div>
-                <p style="font-size:0.75rem; color:var(--text-muted); margin-top:15px;"><i class="fas fa-check-circle" style="color:#00ff64;"></i> Código Validado por el Consejo</p>
-                <p style="font-size:0.65rem; color:var(--text-muted); margin-top:5px;">Escanea este código en la entrada.</p>
+            <!-- Gafete / Credencial -->
+            <div class="credential-card" id="user-credential">
+                <div class="cred-header">
+                    <img src="REGCEN.jpeg" alt="Logo" onerror="this.style.display='none'">
+                    <span>REGCEN</span>
+                </div>
+                <div class="cred-body">
+                    <i class="fas fa-shield-alt team-symbol" id="cred-team-icon"></i>
+                    <div class="team-name" id="cred-team-name">EQUIPO</div>
+                    
+                    <div id="qrcode" class="qr-container"></div>
+                    
+                    <div class="cred-user-name" id="dash-user-name">Nombre del Usuario</div>
+                    <div class="cred-user-origin" id="dash-user-origin">Delegación</div>
+                    <div class="cred-user-code" id="dash-user-code">CODIGO-XXXX</div>
+                    <p style="font-size:0.75rem; color:var(--text-muted); margin-top:15px;"><i class="fas fa-check-circle" style="color:#00ff64;"></i> Código Validado</p>
+                </div>
             </div>
 
             <!-- Info del Evento -->
@@ -455,6 +482,10 @@
                 <strong>Etapa:</strong>
                 <span id="val-etapa">Cargando...</span>
             </div>
+            <div class="data-row" style="background:rgba(255,255,255,0.05); border-radius:6px; padding:10px; margin:10px 0; border:none;">
+                <strong>EQUIPO ASIGNADO:</strong>
+                <span id="val-equipo" style="color:var(--gold); font-weight:900; text-transform:uppercase;">Cargando...</span>
+            </div>
             <div class="data-row">
                 <strong>Talleres:</strong>
                 <span id="val-talleres" style="text-align:right; font-size:0.85rem;">Cargando...</span>
@@ -483,6 +514,16 @@
             "Bisutería", "Cerámica", "Hojas recicladas", "Música"
         ];
 
+        // Configuración de los 6 Equipos Star Wars
+        const EQUIPOS_SW = [
+            { id: 0, nombre: "Rebelión", icono: "fa-rebel", color: "#ff6b6b", glow: "rgba(255, 107, 107, 0.4)" },
+            { id: 1, nombre: "Imperio", icono: "fa-galactic-empire", color: "#6ba3ff", glow: "rgba(107, 163, 255, 0.4)" },
+            { id: 2, nombre: "Jedi", icono: "fa-jedi", color: "#00ff64", glow: "rgba(0, 255, 100, 0.4)" },
+            { id: 3, nombre: "Sith", icono: "fa-sith", color: "#ff3333", glow: "rgba(255, 51, 51, 0.4)" },
+            { id: 4, nombre: "Mandaloriano", icono: "fa-helmet-safety", color: "#fade4b", glow: "rgba(250, 222, 75, 0.4)" },
+            { id: 5, nombre: "República", icono: "fa-sun", color: "#ffaa00", glow: "rgba(255, 170, 0, 0.4)" }
+        ];
+
         // ============================================================
         // AUDIO Y SABLE DE LUZ
         // ============================================================
@@ -507,6 +548,13 @@
                     document.getElementById('val-origen').innerText = reg.origen;
                     document.getElementById('val-etapa').innerText = reg.etapa;
                     
+                    // Mostrar equipo
+                    const eq = EQUIPOS_SW.find(e => e.id === reg.equipoId);
+                    if(eq) {
+                        document.getElementById('val-equipo').innerText = eq.nombre;
+                        document.getElementById('val-equipo').style.color = eq.color;
+                    }
+
                     let talleresTexto = "Ninguno seleccionado";
                     if (reg.talleresElegidos && reg.talleresElegidos.length > 0) {
                         talleresTexto = reg.talleresElegidos.map(id => LISTA_TALLERES[id]).join('<br>');
@@ -526,6 +574,7 @@
                     document.getElementById('val-nombre').innerText = reg.nombre;
                     document.getElementById('val-origen').innerText = reg.origen;
                     document.getElementById('val-etapa').innerText = reg.etapa;
+                    document.getElementById('val-equipo').innerText = "No asignado";
                     document.getElementById('val-talleres').innerText = "No aprobado aún";
                     document.getElementById('val-staff-row').style.display = 'none';
                 } else {
@@ -536,6 +585,7 @@
                     document.getElementById('val-nombre').style.color = "#ff3333";
                     document.getElementById('val-origen').innerText = "-";
                     document.getElementById('val-etapa').innerText = "-";
+                    document.getElementById('val-equipo').innerText = "-";
                     document.getElementById('val-talleres').innerText = "-";
                     document.getElementById('val-staff-row').style.display = 'none';
                 }
@@ -691,7 +741,7 @@
 
             const nuevoRegistro = {
                 id: Date.now(), nombre, origen, edad, telefono, etapa, hospedaje, codigo: nuevoCodigo, aprobado: false,
-                talleresElegidos: [], staff: null
+                talleresElegidos: [], staff: null, equipoId: null
             };
 
             registros.push(nuevoRegistro);
@@ -749,16 +799,15 @@
             const tbody = document.getElementById('admin-table-body');
             tbody.innerHTML = '';
             if (registros.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; color:var(--text-muted); padding:20px;">No hay registros aún.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; color:var(--text-muted); padding:20px;">No hay registros aún.</td></tr>';
                 return;
             }
             
-            // Ordenar: pendientes primero, luego aprobados. Dentro de cada grupo, por fecha de registro descendente.
             const sortedRegistros = [...registros].sort((a, b) => {
                 if (a.aprobado === b.aprobado) {
-                    return b.id - a.id; // Más recientes primero
+                    return b.id - a.id; 
                 }
-                return a.aprobado ? 1 : -1; // Pendientes (false) van primero
+                return a.aprobado ? 1 : -1; 
             });
 
             sortedRegistros.forEach((reg) => {
@@ -771,7 +820,14 @@
                 
                 const staffHtml = reg.staff ? `<span class="badge-staff">${reg.staff}</span>` : '<span style="color:var(--text-muted);">-</span>';
                 
-                // Formato de fecha legible
+                let equipoHtml = '<span style="color:var(--text-muted);">-</span>';
+                if (reg.aprobado && reg.equipoId !== null) {
+                    const eq = EQUIPOS_SW.find(e => e.id === reg.equipoId);
+                    if (eq) {
+                        equipoHtml = `<span style="color:${eq.color}; font-weight:bold;"><i class="fas ${eq.icono}"></i> ${eq.nombre}</span>`;
+                    }
+                }
+
                 const fechaReg = new Date(reg.id).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 
                 const tr = document.createElement('tr');
@@ -783,6 +839,7 @@
                     <td style="white-space:nowrap;">${reg.etapa}<br><span style="color:var(--text-muted); font-size:0.75rem;"><i class="fas fa-bed"></i> ${reg.hospedaje}</span></td>
                     <td style="max-width:200px;">${talleresHtml}</td>
                     <td>${staffHtml}</td>
+                    <td>${equipoHtml}</td>
                     <td>
                         <span class="status-badge ${reg.aprobado ? 'status-approved' : 'status-pending'}">${reg.aprobado ? 'Aprobado' : 'Pendiente'}</span><br>
                         <span style="font-size:0.6rem; color:var(--text-muted);">${fechaReg}</span>
@@ -800,7 +857,24 @@
         function approveRegistration(id) {
             const index = registros.findIndex(r => r.id === id);
             if (index !== -1) {
+                // Contar cuántos aprobados hay por equipo para asignar al que tenga menos
+                let conteoEquipos = [0,0,0,0,0,0];
+                registros.forEach(r => {
+                    if(r.aprobado && r.equipoId !== null) conteoEquipos[r.equipoId]++;
+                });
+                
+                // Encontrar el equipo con el menor número de miembros
+                let minCount = Math.min(...conteoEquipos);
+                let equiposDisponibles = [];
+                conteoEquipos.forEach((count, eqId) => {
+                    if(count === minCount) equiposDisponibles.push(eqId);
+                });
+                
+                // Elegir aleatoriamente entre los que tienen el mínimo (para desempatar)
+                let assignedTeam = equiposDisponibles[Math.floor(Math.random() * equiposDisponibles.length)];
+
                 registros[index].aprobado = true;
+                registros[index].equipoId = assignedTeam;
                 saveRegistros();
                 renderAdminDashboard();
             }
@@ -813,20 +887,39 @@
             if (!currentUser) return;
 
             document.getElementById('dash-user-name').innerText = currentUser.nombre;
+            document.getElementById('dash-user-origin').innerText = currentUser.origen;
             document.getElementById('dash-user-code').innerText = currentUser.codigo;
 
-            // Generar QR con enlace a la validación (Corregido para evitar rutas relativas erróneas)
+            // Cargar estilos del equipo
+            const eq = EQUIPOS_SW.find(e => e.id === currentUser.equipoId);
+            const card = document.getElementById('user-credential');
+            const icon = document.getElementById('cred-team-icon');
+            const name = document.getElementById('cred-team-name');
+            
+            if (eq) {
+                card.style.setProperty('--team-color', eq.color);
+                card.style.setProperty('--team-glow', eq.glow);
+                icon.className = `fas ${eq.icono} team-symbol`;
+                name.innerText = eq.nombre;
+            } else {
+                // Fallback en caso de que no tenga equipo
+                card.style.setProperty('--team-color', 'var(--accent-color)');
+                card.style.setProperty('--team-glow', 'var(--faction-glow)');
+                icon.className = `fas fa-shield-alt team-symbol`;
+                name.innerText = "SIN EQUIPO";
+            }
+
+            // Generar QR
             const qrContainer = document.getElementById('qrcode');
             qrContainer.innerHTML = ''; 
             
-            // Construir URL absoluta limpia
             const baseUrl = window.location.origin + window.location.pathname;
             const qrData = `${baseUrl}?validar=${currentUser.codigo}`;
             
             new QRCode(qrContainer, {
                 text: qrData,
-                width: 160,
-                height: 160,
+                width: 140,
+                height: 140,
                 colorDark : "#000000",
                 colorLight : "#ffffff",
                 correctLevel : QRCode.CorrectLevel.H
